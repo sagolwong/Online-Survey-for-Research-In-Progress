@@ -1,0 +1,124 @@
+/*Nuvbar*/
+
+.nuvbar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: darkcyan;
+    height: 55px;
+}
+
+.nuv{
+    display: flex;
+    height: 100%;
+    padding: 0 1rem;
+    align-items: center;
+}
+
+.nuv_logo{
+    margin-left: 2.5rem;
+    margin-right: 36rem;
+}
+
+.nuv_logo a{
+    color: white;
+    text-decoration: none;
+    font-size: 2rem;
+}
+
+.nuv_items {
+    font-size: 1.3rem;
+    margin-left: auto;
+}
+
+.nuv_items a{
+    color: white;
+    text-decoration: none;
+    padding: 0 0.5rem;
+}
+
+.nuv_items a:hover,
+.nuv_items a:active{
+    color: rgb(1, 87, 87);
+}
+
+.nuv_items i{
+    color: white;
+    text-decoration: none;
+    padding: 0 0.5rem;
+}
+
+.nuv_items i:hover,
+.nuv_items i:active{
+    color: rgb(1, 87, 87);
+}
+
+/* Navbar Toggle Left */
+
+.nuv_toggle_left{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 25px;
+    width: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.nuv_button_left:focus{
+    outline: none;
+}
+
+.navbar-toggle:focus{
+    outline: none;
+}
+
+.nuv_toggle_bar{
+    width: 30px;
+    height: 2px;
+    background: white;
+}
+
+@media (min-width: 830px){
+    .nuv_button_left{
+        display: none;
+    }
+}
+
+/* Navbar Toggle Right */
+
+.nuv_toggle_right{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 25px;
+    width: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.nuv_button_right:focus{
+    outline: none;
+}
+
+.nuv_toggle_point{
+    width: 4px;
+    height: 4px;
+    background: white;
+}
+
+@media (min-width: 830px){
+    .nuv_button_right{
+        display: none;
+    }
+}
+
+
+

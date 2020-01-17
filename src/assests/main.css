@@ -1,0 +1,42 @@
+.main_panel{
+    position: relative;
+    float: right;
+    background-color: white;
+}
+
+/* Section Views */
+
+.sec{
+    height: auto;
+    width: 50%;
+    margin-left: 30rem;
+    margin-right: 5rem;
+    margin-top: 10rem;
+    
+}
+
+.sec a{
+    color: black;
+}
+
+.editor{
+    height: 50%;
+    width: 70%;
+    margin-left: 20rem;
+    margin-right: 5rem;
+    margin-top: 10rem;
+}
+.editor a{
+    color: white;
+}
+
+/* Layout Views */
+
+.layout_user_profile1{
+    text-align: center;
+    margin: 5%;
+}
+
+.layout_user_profile2{
+    margin: 5%;
+}

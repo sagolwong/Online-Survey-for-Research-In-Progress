@@ -1,0 +1,38 @@
+.sidebar{
+    position: fixed;
+    top: 55px;
+    height: 100%;
+    bottom: 0;
+    width: 260px;
+    left: 0;
+    background: white;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 830px){
+    .sidebar{
+        display: none;
+    }
+}
+
+.p_name a{
+    color: black;
+    font-size: 1.5rem;
+}
+
+.sidebar_layout1 {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+}
+
+.sidebar_layout2 {
+    padding-top: 3rem;
+}
+
+.sidebar_layout2 a{
+    color: white;
+}
+
+.sidebar_layout3 {
+    padding-top: 2rem;
+}
