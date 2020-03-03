@@ -57,9 +57,9 @@ class baseManageSurvey extends Component {
 
     showComponent() {
         if (this.state.manage === 1) return <SurveyProfile surveyId={this.props.match.params.surveyId} />
-        else if (this.state.manage === 2) return <SurveyManagement />
-        else if (this.state.manage === 3) return <FollowResult />
-        else if (this.state.manage === 4) return <Feedback />
+        else if (this.state.manage === 2) return <SurveyManagement surveyId={this.props.match.params.surveyId} />
+        //else if (this.state.manage === 3) return <FollowResult />
+        else if (this.state.manage === 4) return <Feedback surveyId={this.props.match.params.surveyId} />
     }
 
     render() {
@@ -82,13 +82,18 @@ class baseManageSurvey extends Component {
                                 </Col>
                             </Row>
                         </div>
-                        <h2 onClick={this.changeProfile}>รายละเอียด</h2>
-                        <h2 onClick={this.changeManage}>การจัดการ</h2>
-                        <h2 onClick={this.changeFollow}>ติดตามผล</h2>
-                        <h2 onClick={this.changeFeedback}>ผลตอบกลับ</h2>
+                        <br></br>
+                        <br></br>
+                        <div style={{marginLeft: "2rem"}}>
+                            <h3 onClick={this.changeProfile}>รายละเอียด</h3><br></br>
+                            <h3 onClick={this.changeManage}>การจัดการ</h3><br></br>
+                            <h3 onClick={this.changeFeedback}>วิเคราะห์ผลลัพธ์</h3><br></br>
+                        </div>
+
                     </div>
                 </Col>
-                <Col sm="12" md={{ size: 6, offset: 3 }}>
+                <Col lg="7" md={{ size: 6, offset: 3 }}>
+                    <br></br>
                     {this.showComponent()}
                 </Col>
             </Row>
@@ -97,3 +102,4 @@ class baseManageSurvey extends Component {
     }
 }
 export default connect()(baseManageSurvey);
+//<h2 onClick={this.changeFollow}>ติดตามผล</h2>

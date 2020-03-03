@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import axios from 'axios';
+import ReactEncrypt from 'react-encrypt'
+import { Input, Modal, ModalHeader, ModalBody, Row, Col, FormGroup, Label, ModalFooter, Button } from 'reactstrap'
 import * as Survey from "survey-react";
 import "survey-react/survey.css";
 import "bootstrap/dist/css/bootstrap.css";
@@ -20,6 +22,7 @@ import "jquery-bar-rating";
 import * as widgets from "surveyjs-widgets";
 
 import "icheck/skins/square/blue.css";
+import EncryptAnswer from '../components/EncryptAnswer';
 window["$"] = window["jQuery"] = $;
 require("icheck");
 
@@ -52,6 +55,15 @@ class OnlineSurvey extends Component {
             survey: {},
             answer: [],
             listSurvey: [],
+            checkDoNot: true,
+            checkHaveGroup: false,
+            modal: false,
+            wantEncrypt: false,
+            dontWantEncrypt: false,
+            resultAsString: {},
+            checkEncrypt: false,
+            encryptAnswer: false,
+            encryptKey: "",
             title: "",
             pages: [],
             cdate: date,
@@ -69,6 +81,9 @@ class OnlineSurvey extends Component {
 
     async componentDidMount() {
         const surveyId = this.props.match.params.surveyId;
+        const userId = "5dc9a42c824eb44fe43c8f94";
+        const name = this.props.match.params.name;
+        console.log(name);
         console.log(surveyId);
         console.log("cdate:" + this.state.cdate);
         console.log("cmonth:" + this.state.cmonth);
@@ -100,7 +115,7 @@ class OnlineSurvey extends Component {
                 console.log(error);
             })
 
-        axios.get('http://localhost:5000/users/5dc9a42c824eb44fe43c8f94')
+        await axios.get('http://localhost:5000/users/' + userId)
             .then(response => {
                 this.setState({
                     profile: response.data
@@ -112,153 +127,7 @@ class OnlineSurvey extends Component {
                 console.log(error);
             })
 
-    }
-    /*json = {
-        title: "วิจัยเทส",
-        builtIns: [
-            {
-                builtInWidget: "gender"
-            },
-            {
-                builtInWidget: "ages"
-            }
-        ],
-        pages: [
-            {
-                name: "page1",
-                elements: [
-                    {
-                        type: "matrix",
-                        name: "q1",
-                        title: "แบบประเมิณความวิตก",
-                        columns: [
-                            {
-                                value: "1",
-                                text: "ไม่มีเลย"
-                            },
-                            {
-                                value: "2",
-                                text: "มีบางครั้ง"
-                            },
-                            {
-                                value: "3",
-                                text: "มีค่อนข้างบ่อย"
-                            },
-                            {
-                                value: "4",
-                                text: "มีมากที่สุด"
-                            }
-                        ],
-                        rows: [
-                            "เมื่อนึกถึงความป่วยครั้งนี้ท่านรู้สึกสงบ",
-                            "เมื่อนึกถึงความป่วยครั้งนี้ท่านรู้สึกมั่นคง"
-                        ]
-                    }
-                ]
-            }
-        ]
-    };*/
-    /*createJson(){
-        const data = {
-            title: this.state.title,
-            pages: this.state.pages
-        }
-        return data
-    }*/
-
-    showSurvey() {
-        console.log("sdate:" + this.state.sdate);
-        console.log("smonth:" + this.state.smonth);
-        console.log("syear:" + this.state.syear);
-        console.log("edate:" + this.state.edate);
-        console.log("emonth:" + this.state.emonth);
-        console.log("eyear:" + this.state.eyear);
-        if ((this.state.cyear <= this.state.syear && (this.state.cmonth < this.state.smonth || (this.state.cdate < this.state.sdate && this.state.cdate >= this.state.sdate))) || (this.state.cmonth === this.state.smonth && this.state.cdate < this.state.sdate)) {
-            return (
-                <div>
-                    ยังไม่ถึงกำหนดเปิด
-                </div>
-            )
-        } else if (this.state.cyear > this.state.eyear || (this.state.cyear === this.state.eyear && (this.state.cmonth > this.state.emonth || (this.state.cmonth === this.state.emonth && this.state.cdate > this.state.edate)))) {
-            return (
-                <div>
-                    เลยกำหนดการเปิดแล้ว
-                </div>
-            )
-        } else {
-            //อาจจะติดตรงที่ มันไม่มี "" หรือป่าว?
-            const title1 = "เทสๆ";
-            const title2 = JSON.stringify(this.state.title);
-            const title3 = this.state.title;
-            console.log(title1);
-            console.log(this.state.title);
-            console.log(title2);
-            console.log(title3);
-            var surveyJSON = {
-                title: title1,
-                pages: [
-                    {
-                        name: "page1",
-                        elements: [
-                            {
-                                type: "matrix",
-                                name: "q1",
-                                title: "แบบประเมิณความวิตก",
-                                columns: [
-                                    {
-                                        value: "1",
-                                        text: "ไม่มีเลย"
-                                    },
-                                    {
-                                        value: "2",
-                                        text: "มีบางครั้ง"
-                                    },
-                                    {
-                                        value: "3",
-                                        text: "มีค่อนข้างบ่อย"
-                                    },
-                                    {
-                                        value: "4",
-                                        text: "มีมากที่สุด"
-                                    }
-                                ],
-                                rows: [
-                                    "เมื่อนึกถึงความป่วยครั้งนี้ท่านรู้สึกสงบ",
-                                    "เมื่อนึกถึงความป่วยครั้งนี้ท่านรู้สึกมั่นคง"
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            };
-            console.log(surveyJSON);
-            console.log(this.state.survey.data);
-            Survey.Survey.cssType = "default";
-            var model = new Survey.Model(this.state.survey.data);
-            console.log(model);
-            return (
-                <div className="App">
-                    <div className="surveyjs">
-                        <h1>SurveyJS library in action:</h1>
-                        <Survey.Survey
-                            model={model}
-                            onComplete={this.onComplete}
-                            onValueChanged={this.onValueChanged} />
-                    </div>
-                </div>
-            )
-        }
-    }
-
-    onValueChanged(result) {
-        console.log("value changed!");
-    }
-
-    async onComplete(result) {
-        //console.log("Complete! " + result);
-        const surveyId = this.props.match.params.surveyId;
-        const userId = "5dca538c955945213c0d52ff";
-        var resultAsString = result.data;
+        //ดึงข้อมูลจาก answers
         await axios.get(`http://localhost:5000/answers/find/` + surveyId)
             .then(response => {
                 this.setState({
@@ -270,7 +139,7 @@ class OnlineSurvey extends Component {
             .catch((error) => {
                 console.log(error);
             })
-
+        //ดึงข้อมูลจาก listSurvey
         await axios.get(`http://localhost:5000/listSurvey/find/` + userId)
             .then(response => {
                 this.setState({
@@ -283,30 +152,539 @@ class OnlineSurvey extends Component {
                 console.log(error);
             })
 
+
+        //วน loop หาว่ามีการเพิ่ม surveyId ลง listSurvey ของ userId นี้แล้วหรือไม่
+        if (await this.state.listSurvey[0] !== undefined) {
+            this.state.listSurvey[0].listSurvey.map(res => {
+                if (res === surveyId) {
+                    this.setState({
+                        checkDoNot: false
+                    })
+                    console.log(this.state.checkDoOnce);
+                }
+            })
+        }
+
+        if (await this.state.survey.haveGroup) {
+            this.state.survey.names.map(user => {
+                if (user === userId) {
+                    this.setState({
+                        checkHaveGroup: true
+                    })
+                }
+            })
+            console.log(this.state.checkHaveGroup);
+        }
+
+    }
+
+    showSurvey() {
+        console.log("sdate:" + this.state.sdate);
+        console.log("smonth:" + this.state.smonth);
+        console.log("syear:" + this.state.syear);
+        console.log("edate:" + this.state.edate);
+        console.log("emonth:" + this.state.emonth);
+        console.log("eyear:" + this.state.eyear);
+        if ((this.state.survey.haveGroup && this.state.checkHaveGroup) || !this.state.survey.haveGroup) {
+            if ((this.state.cyear <= this.state.syear && (this.state.cmonth < this.state.smonth || (this.state.cdate < this.state.sdate && this.state.cdate >= this.state.sdate))) || (this.state.cmonth === this.state.smonth && this.state.cdate < this.state.sdate)) {
+                return (
+                    <div>
+                        ยังไม่ถึงกำหนดเปิด
+                </div>
+                )
+            } else if (this.state.cyear > this.state.eyear || (this.state.cyear === this.state.eyear && (this.state.cmonth > this.state.emonth || (this.state.cmonth === this.state.emonth && this.state.cdate > this.state.edate)))) {
+                return (
+                    <div>
+                        เลยกำหนดการเปิดแล้ว
+                </div>
+                )
+            } else {
+                //อาจจะติดตรงที่ มันไม่มี "" หรือป่าว?
+                /* const title1 = "เทสๆ";
+                 const title2 = JSON.stringify(this.state.title);
+                 const title3 = this.state.title;
+                 console.log(title1);
+                 console.log(this.state.title);
+                 console.log(title2);
+                 console.log(title3);
+                 var surveyJSON = {
+                     title: title1,
+                     pages: [
+                         {
+                             name: "page1",
+                             elements: [
+                                 {
+                                     type: "matrix",
+                                     name: "q1",
+                                     title: "แบบประเมิณความวิตก",
+                                     columns: [
+                                         {
+                                             value: "1",
+                                             text: "ไม่มีเลย"
+                                         },
+                                         {
+                                             value: "2",
+                                             text: "มีบางครั้ง"
+                                         },
+                                         {
+                                             value: "3",
+                                             text: "มีค่อนข้างบ่อย"
+                                         },
+                                         {
+                                             value: "4",
+                                             text: "มีมากที่สุด"
+                                         }
+                                     ],
+                                     rows: [
+                                         "เมื่อนึกถึงความป่วยครั้งนี้ท่านรู้สึกสงบ",
+                                         "เมื่อนึกถึงความป่วยครั้งนี้ท่านรู้สึกมั่นคง"
+                                     ]
+                                 }
+                             ]
+                         }
+                     ]
+                 };*/
+                //console.log(surveyJSON);
+                if ((this.state.survey.doOnce && this.state.checkDoNot) || (!this.state.survey.doOnce)) {
+                    var elements = [];
+                    if (this.state.survey.builtIns[0] !== undefined) {
+                        this.state.survey.builtIns.map(q => {
+                            if (q.builtInWidget === "gender") {
+                                elements = elements.concat({
+                                    type: "radiogroup",
+                                    name: "widgetGender",
+                                    title: "เพศ",
+                                    choices: [
+                                        "ชาย",
+                                        "หญิง"
+                                    ],
+                                    colCount: 2
+                                })
+                            } else if (q.builtInWidget === "ages") {
+                                elements = elements.concat({
+                                    type: "radiogroup",
+                                    name: "widgetAges",
+                                    title: "อายุ",
+                                    choices: [
+                                        {
+                                            value: "low18",
+                                            text: "น้อยกว่า 18 ปี"
+                                        },
+                                        {
+                                            value: "18-23",
+                                            text: "18 - 23 ปี"
+                                        },
+                                        {
+                                            value: "24-29",
+                                            text: "24 - 29 ปี"
+                                        },
+                                        {
+                                            value: "30-35",
+                                            text: "30 - 35 ปี"
+                                        },
+                                        {
+                                            value: "36-41",
+                                            text: "36 - 41 ปี"
+                                        },
+                                        {
+                                            value: "42-47",
+                                            text: "42 - 47 ปี"
+                                        },
+                                        {
+                                            value: "48-53",
+                                            text: "48 - 53 ปี"
+                                        },
+                                        {
+                                            value: "54-60",
+                                            text: "54 - 60 ปี"
+                                        },
+                                        {
+                                            value: "more60",
+                                            text: "มากกว่า 60 ปี"
+                                        }
+                                    ]
+                                })
+                            } else if (q.builtInWidget === "status") {
+                                elements = elements.concat({
+                                    type: "radiogroup",
+                                    name: "widgetStatus",
+                                    title: "สถานภาพ",
+                                    choices: [
+                                        {
+                                            value: "single",
+                                            text: "โสด"
+                                        },
+                                        {
+                                            value: "marry",
+                                            text: "สมรส"
+                                        },
+                                        {
+                                            value: "separated",
+                                            text: "หย่าร้าง, หม้าย, แยกกันอยู่"
+                                        }
+                                    ]
+                                })
+                            } else if (q.builtInWidget === "education") {
+                                elements = elements.concat({
+                                    type: "radiogroup",
+                                    name: "widgetEducation",
+                                    title: "ระดับการศึกษาขั้นสูงสุด",
+                                    choices: [
+                                        {
+                                            value: "ประถมศึกษา",
+                                            text: "ประถมศึกษา"
+                                        },
+                                        {
+                                            value: "มัธยมศึกษา",
+                                            text: "มัธยมศึกษา"
+                                        },
+                                        {
+                                            value: "ปวช./ปวส./อนุปริญญา",
+                                            text: "ปวช./ปวส./อนุปริญญา"
+                                        },
+                                        {
+                                            value: "ปริญญาตรี",
+                                            text: "ปริญญาตรี"
+                                        },
+                                        {
+                                            value: "ปริญญาโทหรือสูงกว่า",
+                                            text: "ปริญญาโทหรือสูงกว่า"
+                                        }
+                                    ]
+                                })
+                            } else if (q.builtInWidget === "job") {
+                                elements = elements.concat({
+                                    type: "radiogroup",
+                                    name: "widgetJob",
+                                    title: "อาชีพ",
+                                    choices: [
+                                        {
+                                            value: "นักเรียน",
+                                            text: "นักเรียน"
+                                        },
+                                        {
+                                            value: "นิสิต/นักศึกษา",
+                                            text: "นิสิต/นักศึกษา"
+                                        },
+                                        {
+                                            value: "ข้าราชการ/รัฐวิสาหกิจ",
+                                            text: "ข้าราชการ/รัฐวิสาหกิจ"
+                                        },
+                                        {
+                                            value: "พนักงานบริษัทเอกชน",
+                                            text: "พนักงานบริษัทเอกชน"
+                                        },
+                                        {
+                                            value: "ธุรกิจส่วนตัว",
+                                            text: "ธุรกิจส่วนตัว"
+                                        },
+                                        {
+                                            value: "รับจ้าง",
+                                            text: "รับจ้าง"
+                                        },
+                                        {
+                                            value: "แม่บ้าน",
+                                            text: "แม่บ้าน"
+                                        }
+                                    ],
+                                    otherText: "อื่นๆ โปรดระบุ"
+                                })
+                            } else if (q.builtInWidget === "income") {
+                                elements = elements.concat({
+                                    type: "radiogroup",
+                                    name: "widgetIncome",
+                                    title: "รายได้เฉลี่ยต่อเดือน",
+                                    choices: [
+                                        {
+                                            value: "low5000",
+                                            text: "น้อยกว่า 5,000 บาท"
+                                        },
+                                        {
+                                            value: "5000-10000",
+                                            text: "5,000-10,000 บาท"
+                                        },
+                                        {
+                                            value: "10001-20000",
+                                            text: "10,001-20,000 บาท"
+                                        },
+                                        {
+                                            value: "20001-30000",
+                                            text: "20,001-30,000 บาท"
+                                        },
+                                        {
+                                            value: "more30000",
+                                            text: "มากกว่า 30,000 บาท"
+                                        }
+                                    ]
+                                })
+                            }
+                        })
+                        var widget = {
+                            name: "widget",
+                            elements
+                        }
+                    }
+
+                    /*if (this.state.survey.builtIns[0] && this.state.survey.builtIns[1]) {
+                        var widget = {
+                            name: "widget",
+                            elements: [
+                                {
+                                    type: "radiogroup",
+                                    name: "widget1",
+                                    title: "เพศ",
+                                    choices: [
+                                        "ชาย",
+                                        "หญิง"
+                                    ],
+                                    colCount: 2
+                                },
+                                {
+                                    type: "text",
+                                    name: "widget2",
+                                    title: "อายุ"
+                                }
+                            ]
+                        }
+                    } else if (this.state.survey.builtIns[0]) {
+                        var widget = {
+                            name: "widget",
+                            elements: [
+                                {
+                                    type: "radiogroup",
+                                    name: "widget1",
+                                    title: "เพศ",
+                                    choices: [
+                                        "ชาย",
+                                        "หญิง"
+                                    ],
+                                    colCount: 2
+                                }
+                            ]
+                        }
+                    } else if (this.state.survey.builtIns[1]) {
+                        var widget = {
+                            name: "widget",
+                            elements: [
+                                {
+                                    type: "text",
+                                    name: "widget1",
+                                    title: "อายุ"
+                                }
+                            ]
+                        }
+                    }*/
+
+                    var form = JSON.parse(this.state.survey.data);
+                    if (this.state.survey.builtIns[0] !== undefined) {
+                        form.pages[1] = form.pages[0];
+                        form.pages[0] = widget;
+                    }
+
+                    console.log(form.pages);
+                    Survey.Survey.cssType = "default";
+                    var model = new Survey.Model(form);
+                    console.log(model);
+                    return (
+                        <div className="App">
+                            <div className="surveyjs">
+                                <h1>SurveyJS library in action:</h1>
+                                <Survey.Survey
+                                    model={model}
+                                    onComplete={this.onComplete}
+                                    onValueChanged={this.onValueChanged} />
+                            </div>
+                        </div>
+                    )
+                } else {
+                    return "แบบสอบถามสามารถทำได้ครั้งเดียว"
+                }
+
+            }
+        } else return "ไม่มีรายชื่อตรงกับสมาชิกในโปรเจค คุณไม่สามารถทำได้"
+
+    }
+
+    onValueChanged(result) {
+        console.log("value changed!");
+    }
+
+    async onComplete(result) {
+        //console.log("Complete! " + result);
+        const surveyId = this.props.match.params.surveyId;
+        const userId = "5e1976f8652e4342fc6c0223";
+        const name = this.props.match.params.name;
+        var resultAsString = result.data;
+
+
+        if (await this.state.survey.shareTo === "close" || this.state.survey.shareTo === "open") {
+            //var resultAsString = result.data;
+            this.setState({
+                modal: true
+            })
+            if (this.state.survey.wantName) {
+                this.setState({
+                    resultAsString: {
+                        name: this.state.profile.firstname + " " + this.state.profile.lastname,
+                        resultAsString
+                    }
+                })
+            }
+            console.log(this.state.resultAsString);
+        } else {
+            if (await this.state.survey.wantName) {
+                this.setState({
+                    resultAsString: {
+                        name: name,
+                        resultAsString
+                    },
+                    checkEncrypt: true
+                })
+            }
+            await this.setState({ checkEncrypt: true })
+
+        }
+
+
+        //console.log(resultAsString.question1);
+        /*if (this.props.test.checkEncrypt) {
+            //เช็กว่าถ้ามีการสร้าง answer ไว้อยู่แล้วให้ update ค่าเข้าไป
+            if (await this.state.answer[0] !== undefined) {
+                const editAnswer = {
+                    //amountUser: รอเช็กกับ userId ว่ามีอยู่แล้วไหม?
+                    amountAnswer: this.state.answer[0].amountAnswer + 1,
+                    answerUsers: this.state.answer[0].answerUsers.concat(this.state.resultAsString)
+                }
+                console.log(editAnswer);
+                axios.post(`http://localhost:5000/answers/edit/${this.state.answer[0]._id}`, editAnswer)
+                    .then(res => console.log(res.data));
+                //แต่ถ้าไม่มี ให้สร้าง answer สำหรับ surveyId นี้ขึ้นมาใหม่เลย
+            } else {
+                const createAnswer = {
+                    surveyId: surveyId,
+                    answerUsers: [this.state.resultAsString]
+                }
+                console.log(createAnswer);
+                axios.post('http://localhost:5000/answers/create', createAnswer)
+                    .then(res => console.log(res.data));
+            }
+            //เช็กว่ามีการสร้าง listSurvey สำหรับ userId แล้วหรือยัง
+            if (await this.state.listSurvey[0] !== undefined) {
+                var check1 = false;
+                //วน loop หาว่ามีการเพิ่ม surveyId ลง listSurvey ของ userId นี้แล้วหรือไม่
+                this.state.listSurvey[0].listSurvey.map(res => {
+                    if (res !== surveyId) {
+                        check1 = true;
+                    } else {
+                        check1 = false;
+                    }
+                })
+                //ถ้ายังไม่มี (check1=true) ให้เพิ่ม surveyId ลง listSurvey ด้วยการ update ค่า 
+                if (check1) {
+                    const editListSurvey = {
+                        listSurvey: this.state.listSurvey[0].listSurvey.concat(surveyId)
+                    }
+                    console.log(editListSurvey);
+                    axios.post(`http://localhost:5000/listSurvey/edit/${this.state.listSurvey[0]._id}`, editListSurvey)
+                        .then(res => console.log(res.data));
+                }
+                //ถ้ายังไม่มีก็ให้สร้าง listSurvey สำหรับ userId นั้นๆขึ้นมา
+            } else {
+                const createListSurvey = {
+                    userId: userId,
+                    listSurvey: [surveyId]
+                }
+                console.log(createListSurvey);
+                axios.post('http://localhost:5000/listSurvey/create', createListSurvey)
+                    .then(res => console.log(res.data));
+            }
+            //เช็กว่ามีการเพิ่มค่าเข้าไปใน recentOthersurvey หรือยัง
+            if (await this.state.profile.recentOtherSurveys[0] !== undefined) {
+                var check2 = false;
+                //วน loop เพื่อเช็กว่าเคยเพิ่ม surveyId นี้เข้าไปหรือยัง
+                this.state.profile.recentOtherSurveys.map(res => {
+                    if (res !== surveyId) check2 = true;
+                    else check2 = false;
+                })
+                //ถ้ายังไม่มี (check2=true) 
+                if (check2) {
+                    //แก้ไปใช้ spilice(0,0,{surveyId})
+                    //ให้เช็กว่า recentOtherSurvey มี array มากกว่า 11 ไหม ถ้าไม่ ให้ update ค่าเพิ่มไปได้เลย
+                    if (await this.state.profile.recentOtherSurveys.length < 10) {
+                        const editRecentProject = await {
+                            recentOtherSurveys: this.state.profile.recentOtherSurveys.concat(surveyId),
+                            recentProjects: this.state.profile.recentProjects
+                        }
+                        await axios.post(`http://localhost:5000/users/edit/${userId}`, editRecentProject)
+                            .then(res => console.log(res.data));
+                        //แก้ไปใช้ pop() เพื่อเอาตัวสุดท้ายออก แล้วใช้ spilice(0,0,surveyId) เพื่อเพิ่มอันใหม่มาที่ตัวแรก 
+                        //แต่ถ้ามีเท่ากับ 11 หรือ มากกว่า(เป็นไปไม่ได้นอกจาก bug) ให้นำค่าใหม่มาเพิ่มและให้ค่าเก่าสุดเอาออกไปแล้วค่อย update
+                    } else {
+                        this.state.profile.recentOtherSurveys[0] = await this.state.profile.recentOtherSurveys[1];
+                        this.state.profile.recentOtherSurveys[1] = await this.state.profile.recentOtherSurveys[2];
+                        this.state.profile.recentOtherSurveys[2] = await this.state.profile.recentOtherSurveys[3];
+                        this.state.profile.recentOtherSurveys[3] = await this.state.profile.recentOtherSurveys[4];
+                        this.state.profile.recentOtherSurveys[4] = await this.state.profile.recentOtherSurveys[5];
+                        this.state.profile.recentOtherSurveys[5] = await this.state.profile.recentOtherSurveys[6];
+                        this.state.profile.recentOtherSurveys[6] = await this.state.profile.recentOtherSurveys[7];
+                        this.state.profile.recentOtherSurveys[7] = await this.state.profile.recentOtherSurveys[8];
+                        this.state.profile.recentOtherSurveys[8] = await this.state.profile.recentOtherSurveys[9];
+                        this.state.profile.recentOtherSurveys[9] = await surveyId;
+                        const editRecentProject = await {
+                            recentOtherSurveys: this.state.profile.recentOtherSurveys,
+                            recentProjects: this.state.profile.recentProjects
+                        }
+                        await axios.post(`http://localhost:5000/users/edit/${userId}`, editRecentProject)
+                            .then(res => console.log(res.data));
+                    }
+                }
+                //ถ้ายังไม่มีก็ให้ เพิ่มค่าลำดับแรกเข้าไปได้เลยโดยการ update
+            } else {
+                const editRecentProject = await {
+                    recentOtherSurveys: this.state.profile.recentOtherSurveys.concat(surveyId),
+                    recentProjects: this.state.profile.recentProjects
+                }
+                await axios.post(`http://localhost:5000/users/edit/${userId}`, editRecentProject)
+                    .then(res => console.log(res.data));
+            }
+        }*/
+    }
+    async sendData(){
+        const surveyId = this.props.match.params.surveyId;
+        const userId = "5e1976f8652e4342fc6c0223";
+
+        //เช็กว่าถ้ามีการสร้าง answer ไว้อยู่แล้วให้ update ค่าเข้าไป
         if (await this.state.answer[0] !== undefined) {
             const editAnswer = {
                 //amountUser: รอเช็กกับ userId ว่ามีอยู่แล้วไหม?
                 amountAnswer: this.state.answer[0].amountAnswer + 1,
-                answerUsers: this.state.answer[0].answerUsers.concat(resultAsString)
+                answerUsers: this.state.answer[0].answerUsers.concat(this.state.resultAsString)
             }
             console.log(editAnswer);
             axios.post(`http://localhost:5000/answers/edit/${this.state.answer[0]._id}`, editAnswer)
                 .then(res => console.log(res.data));
+            //แต่ถ้าไม่มี ให้สร้าง answer สำหรับ surveyId นี้ขึ้นมาใหม่เลย
         } else {
             const createAnswer = {
                 surveyId: surveyId,
-                answerUsers: [resultAsString]
+                answerUsers: [this.state.resultAsString]
             }
             console.log(createAnswer);
             axios.post('http://localhost:5000/answers/create', createAnswer)
                 .then(res => console.log(res.data));
         }
-
+        //เช็กว่ามีการสร้าง listSurvey สำหรับ userId แล้วหรือยัง
         if (await this.state.listSurvey[0] !== undefined) {
             var check1 = false;
+            //วน loop หาว่ามีการเพิ่ม surveyId ลง listSurvey ของ userId นี้แล้วหรือไม่
             this.state.listSurvey[0].listSurvey.map(res => {
-                if (res !== surveyId) check1 = true;
+                if (res !== surveyId) {
+                    check1 = true;
+                } else {
+                    check1 = false;
+                }
             })
+            //ถ้ายังไม่มี (check1=true) ให้เพิ่ม surveyId ลง listSurvey ด้วยการ update ค่า 
             if (check1) {
                 const editListSurvey = {
                     listSurvey: this.state.listSurvey[0].listSurvey.concat(surveyId)
@@ -315,7 +693,7 @@ class OnlineSurvey extends Component {
                 axios.post(`http://localhost:5000/listSurvey/edit/${this.state.listSurvey[0]._id}`, editListSurvey)
                     .then(res => console.log(res.data));
             }
-
+            //ถ้ายังไม่มีก็ให้สร้าง listSurvey สำหรับ userId นั้นๆขึ้นมา
         } else {
             const createListSurvey = {
                 userId: userId,
@@ -325,20 +703,27 @@ class OnlineSurvey extends Component {
             axios.post('http://localhost:5000/listSurvey/create', createListSurvey)
                 .then(res => console.log(res.data));
         }
-
+        //เช็กว่ามีการเพิ่มค่าเข้าไปใน recentOthersurvey หรือยัง
         if (await this.state.profile.recentOtherSurveys[0] !== undefined) {
             var check2 = false;
+            //วน loop เพื่อเช็กว่าเคยเพิ่ม surveyId นี้เข้าไปหรือยัง
             this.state.profile.recentOtherSurveys.map(res => {
                 if (res !== surveyId) check2 = true;
+                else check2 = false;
             })
+            //ถ้ายังไม่มี (check2=true) 
             if (check2) {
+                //แก้ไปใช้ spilice(0,0,{surveyId})
+                //ให้เช็กว่า recentOtherSurvey มี array มากกว่า 11 ไหม ถ้าไม่ ให้ update ค่าเพิ่มไปได้เลย
                 if (await this.state.profile.recentOtherSurveys.length < 10) {
                     const editRecentProject = await {
                         recentOtherSurveys: this.state.profile.recentOtherSurveys.concat(surveyId),
                         recentProjects: this.state.profile.recentProjects
                     }
-                    await axios.post('http://localhost:5000/users/edit/5dc9a42c824eb44fe43c8f94', editRecentProject)
+                    await axios.post(`http://localhost:5000/users/edit/${userId}`, editRecentProject)
                         .then(res => console.log(res.data));
+                    //แก้ไปใช้ pop() เพื่อเอาตัวสุดท้ายออก แล้วใช้ spilice(0,0,surveyId) เพื่อเพิ่มอันใหม่มาที่ตัวแรก 
+                    //แต่ถ้ามีเท่ากับ 11 หรือ มากกว่า(เป็นไปไม่ได้นอกจาก bug) ให้นำค่าใหม่มาเพิ่มและให้ค่าเก่าสุดเอาออกไปแล้วค่อย update
                 } else {
                     this.state.profile.recentOtherSurveys[0] = await this.state.profile.recentOtherSurveys[1];
                     this.state.profile.recentOtherSurveys[1] = await this.state.profile.recentOtherSurveys[2];
@@ -354,20 +739,64 @@ class OnlineSurvey extends Component {
                         recentOtherSurveys: this.state.profile.recentOtherSurveys,
                         recentProjects: this.state.profile.recentProjects
                     }
-                    await axios.post('http://localhost:5000/users/edit/5dc9a42c824eb44fe43c8f94', editRecentProject)
+                    await axios.post(`http://localhost:5000/users/edit/${userId}`, editRecentProject)
                         .then(res => console.log(res.data));
                 }
             }
-        }else {
+            //ถ้ายังไม่มีก็ให้ เพิ่มค่าลำดับแรกเข้าไปได้เลยโดยการ update
+        } else {
             const editRecentProject = await {
                 recentOtherSurveys: this.state.profile.recentOtherSurveys.concat(surveyId),
                 recentProjects: this.state.profile.recentProjects
             }
-            await axios.post('http://localhost:5000/users/edit/5dc9a42c824eb44fe43c8f94', editRecentProject)
+            await axios.post(`http://localhost:5000/users/edit/${userId}`, editRecentProject)
                 .then(res => console.log(res.data));
         }
+    }
 
-
+    toggleModal() {
+        this.setState({
+            modal: !this.state.modal
+        });
+    }
+    onChangeEncrypt() {
+        this.setState({
+            wantEncrypt: !this.state.wantEncrypt,
+            dontWantEncrypt: false
+        });
+    }
+    onChangeDoNotEncrypt() {
+        this.setState({
+            dontWantEncrypt: !this.state.dontWantEncrypt,
+            wantEncrypt: false
+        });
+    }
+    onChangePassword(e) {
+        this.setState({
+            encryptKey: e.target.value
+        });
+    }
+    confirm() {
+        if (this.state.dontWantEncrypt) {
+            this.setState({
+                modal: false,
+                checkEncrypt: true
+            })
+        }/* else {
+           this.setState({
+               encryptAnswer: true,
+               modal: false
+           })
+        }*/
+    }
+    encryptAnswer() {
+        return (
+            <ReactEncrypt
+                encryptKey={this.state.encryptKey}
+            >
+                <EncryptAnswer answer={this.state.resultAsString} />
+            </ReactEncrypt>
+        )
     }
 
     render() {
@@ -420,8 +849,45 @@ class OnlineSurvey extends Component {
         return (
             <div>
                 {this.showSurvey()}
+                <Modal isOpen={this.state.modal} toggle={this.toggleModal.bind(this)}
+                    fade={true} backdrop="static" className={this.props.className}>
+                    <ModalHeader>ท่านต้องการปกปิดคำตอบของท่านหรือไม่?</ModalHeader>
+                    <ModalBody>
+                        <Row>
+                            <Col>
+                                <FormGroup check>
+                                    <Label check>
+                                        <Input type="radio" name="radio1" onChange={this.onChangeEncrypt.bind(this)} />{''}
+                                        ปกปิดคำตอบ
+                                </Label>
+                                </FormGroup>
+                            </Col>
+                            <Col>
+                                <FormGroup check>
+                                    <Label check>
+                                        <Input type="radio" name="radio1" onChange={this.onChangeDoNotEncrypt.bind(this)} />{''}
+                                        ไม่ปกปิดคำตอบ
+                                </Label>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        {this.state.wantEncrypt ? <Input type="password" placeholder="กรุณาใส่รหัสผ่านเพื่อใช้ปกปิดข้อมูลของท่าน" onChange={this.onChangePassword.bind(this)} /> : ""}
+                    </ModalBody>
+                    <ModalFooter>
+                        {(this.state.wantEncrypt && (this.state.password !== "")) || this.state.dontWantEncrypt ?
+                            <Button color="info" onClick={this.confirm.bind(this)}>ยืนยัน</Button> :
+                            <Button color="info" onClick={this.confirm.bind(this)} disabled>ยืนยัน</Button>}
+                    </ModalFooter>
+                </Modal>
+                {console.log(this.props.test.checkEncrypt)}
+                {this.state.checkEncrypt ? this.sendData() : ""}
             </div>
         )
     }
 }
-export default connect()(OnlineSurvey);
+const mapStateToProps = (state) => {
+    return {
+        test: state
+    }
+}
+export default connect(mapStateToProps)(OnlineSurvey);

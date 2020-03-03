@@ -14,7 +14,7 @@ router.route('/create').post((req, res) => {
     const description = req.body.description;
     const shareTo = req.body.shareTo;
     const wantName = req.body.wantName;
-    const haveTwoGroup = req.body.haveTwoGroup;
+    const haveGroup = req.body.haveGroup;
     const names = req.body.names;
     const listNameExperiments = req.body.listNameExperiments;
     const listNameControls = req.body.listNameControls;
@@ -22,6 +22,7 @@ router.route('/create').post((req, res) => {
     const doOnce = req.body.doOnce;
     const openAndCloseTimes = req.body.openAndCloseTimes;
     const qprocess = req.body.qprocess;
+    const builtIns = req.body.builtIns;
     const data = req.body.data;
 
     const newSurvey = new Survey({
@@ -31,7 +32,7 @@ router.route('/create').post((req, res) => {
         description,
         shareTo,
         wantName,
-        haveTwoGroup,
+        haveGroup,
         names,
         listNameExperiments,
         listNameControls,
@@ -39,6 +40,7 @@ router.route('/create').post((req, res) => {
         doOnce,
         openAndCloseTimes,
         qprocess,
+        builtIns,
         data
     });
 
@@ -71,6 +73,12 @@ router.route('/group/:id').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/:id/:nameSurvey').get((req, res) => {
+    Survey.find({ projectId: req.params.id, nameSurvey: req.params.nameSurvey  })
+        .then(surveys => res.json(surveys))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/:id').delete((req, res) => {
     Survey.findByIdAndDelete(req.params.id)
         .then(() => res.json('Survey deleted.'))
@@ -85,7 +93,7 @@ router.route('/edit/:id').post((req, res) => {
             survey.description = req.body.description;
             survey.shareTo = req.body.shareTo;
             survey.wantName = req.body.wantName;
-            survey.haveTwoGroup = req.body.haveTwoGroup;
+            survey.haveGroup = req.body.haveGroup;
             survey.names = req.body.names;
             survey.listNameExperiments = req.body.listNameExperiments;
             survey.listNameControls = req.body.listNameControls;
@@ -98,6 +106,42 @@ router.route('/edit/:id').post((req, res) => {
 
             survey.save()
                 .then(() => res.json('Survey update!'))
+                .catch(err => res.status(400).json('Error: ' + err));
+        })
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/member/:id').post((req, res) => {
+    Survey.findById(req.params.id)
+        .then(survey => {
+            survey.names = req.body.names;
+
+            survey.save()
+                .then(() => res.json('Survey update!'))
+                .catch(err => res.status(400).json('Error: ' + err));
+        })
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/experiments/:id').post((req, res) => {
+    Survey.findById(req.params.id)
+        .then(survey => {
+            survey.listNameExperiments = req.body.listNameExperiments;
+
+            survey.save()
+                .then(() => res.json('ListNameExperiments update!'))
+                .catch(err => res.status(400).json('Error: ' + err));
+        })
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/controls/:id').post((req, res) => {
+    Survey.findById(req.params.id)
+        .then(survey => {
+            survey.listNameControls = req.body.listNameControls;
+
+            survey.save()
+                .then(() => res.json('ListNameControls update!'))
                 .catch(err => res.status(400).json('Error: ' + err));
         })
         .catch(err => res.status(400).json('Error: ' + err));

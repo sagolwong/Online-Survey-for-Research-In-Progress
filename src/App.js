@@ -16,6 +16,8 @@ import SampleGroupManagement from './views/SampleGroupManagement';
 import OnlineSurvey from './views/OnlineSurvey';
 import { connect } from 'react-redux';
 import baseManageSurvey from './components/baseManageSurvey';
+import CheckBeforeDo from './views/CheckBeforeDo';
+import InviteToGroup from './views/InviteToGroup';
 
 
 class App extends Component {
@@ -82,6 +84,9 @@ class App extends Component {
         <Route exact path="/create-survey/:projectId" component={baseCreateSurvey} />
         <Route exact path="/create-survey/:projectId/:sampleGroupId" component={baseCreateSurvey} />
         <Route exact path="/online-survey/:surveyId" component={OnlineSurvey} />
+        <Route exact path="/online-survey/:surveyId/name=:name" component={OnlineSurvey} />
+        <Route exact path="/online-survey-check/:surveyId" component={CheckBeforeDo} />
+        <Route exact path="/invite-to-group/:surveyId" component={InviteToGroup} />
         <Route exact path="/survey-management/:surveyId" component={baseManageSurvey} />
       </Switch>
     )

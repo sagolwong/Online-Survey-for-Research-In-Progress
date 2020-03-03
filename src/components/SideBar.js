@@ -19,7 +19,7 @@ export default class SideBar extends Component {
     }
 
     async componentDidMount() {
-        await axios.get('http://localhost:5000/users/5e197742652e4342fc6c0225')
+        await axios.get('http://localhost:5000/users/5e37c88484824b4da85b9e76')
             .then(response => {
                 this.setState({
                     profile: response.data

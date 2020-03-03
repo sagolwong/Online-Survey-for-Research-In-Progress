@@ -18,7 +18,7 @@ export default class ListSampleGroup extends Component {
     render() {
         return (
             <div>
-                <Card onClick={this.goToSampleGroup}>{this.props.sampleGroup.nameSampleGroup}</Card>  
+                <Card style={{width:"600px"}} onClick={this.goToSampleGroup}>{this.props.sampleGroup.nameSampleGroup}</Card>  
             </div>
         )
     }

@@ -30,19 +30,19 @@ export default class Toolbar extends Component {
     componentDidMount() {
         //รับค่า user แบบลักไก่
         axios.get('http://localhost:5000/users/5dc9a42c824eb44fe43c8f94')
-          .then(response => {
-            this.setState({
-              profile: response.data
+            .then(response => {
+                this.setState({
+                    profile: response.data
+                })
+                /*console.log(this.state.profile.firstname);
+                console.log(this.state.profile.role);
+                console.log(this.state.profile._id);*/
             })
-            /*console.log(this.state.profile.firstname);
-            console.log(this.state.profile.role);
-            console.log(this.state.profile._id);*/
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-    
-      }
+            .catch((error) => {
+                console.log(error);
+            })
+
+    }
 
     toggle() {
         this.setState({ isOpen: !this.state.isOpen })
@@ -76,22 +76,12 @@ export default class Toolbar extends Component {
                         </div>
                     </NavbarToggler>
                     <Collapse isOpen={this.state.isOpen} navbar >
-                        <form>
-                            <InputGroup className="no-border">
-                                <Input placeholder="Search..." />
-                                <InputGroupAddon addonType="append">
-                                    <InputGroupText>
-                                        <i className="fas fa-search" />
-                                    </InputGroupText>
-                                </InputGroupAddon>
-                            </InputGroup>
-                        </form>
                         <Nav navbar className="nuv_items">
                             <NavItem>
                                 <div><a href="/"><i className="fas fa-bell" />คำขอร้อง</a></div>
                             </NavItem>
                             <NavItem>
-                                {this.props.role === "Responder" ?<div ><a href="/surveys">แบบสอบถาม</a></div>:<div ><a href="/surveys">แบบสอบถาม</a><a href="/projects">โปรเจค</a></div> }
+                                {this.props.role === "Responder" ? <div ><a href="/surveys">แบบสอบถาม</a></div> : <div ><a href="/surveys">แบบสอบถาม</a><a href="/projects">โปรเจค</a></div>}
                             </NavItem>
                             {console.log(this.props.role)}
                             <NavItem>
@@ -104,3 +94,16 @@ export default class Toolbar extends Component {
         )
     }
 }
+
+/* ช่องค้นหาแบบสอบถามที่ถูกตัดออกไปก่อน
+ <form>
+    <InputGroup className="no-border">
+        <Input placeholder="Search..." />
+        <InputGroupAddon addonType="append">
+            <InputGroupText>
+                <i className="fas fa-search" />
+            </InputGroupText>
+        </InputGroupAddon>
+    </InputGroup>
+ </form>
+ */

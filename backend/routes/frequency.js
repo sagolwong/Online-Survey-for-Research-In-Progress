@@ -20,9 +20,9 @@ router.route('/create').post((req, res) => {
     .then(() => res.json('Frequency create!'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
-/*
+
 router.route('/:id').get((req, res) => {
-    Frequency.find({ userId: req.params.id })
+    Frequency.findById(req.params.id)
     .then(frequencies => res.json(frequencies))
     .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -38,7 +38,7 @@ router.route('/:id').delete((req, res) => {
     .then(() => res.json('Frequency deleted.'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
-
+/*
 router.route('/edit/:id').post((req, res) => {
     Frequency.findById(req.params.id)
     .then(frequency => {

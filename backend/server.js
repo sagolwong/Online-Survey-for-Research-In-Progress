@@ -31,6 +31,7 @@ const answersRouter = require('./routes/answers');
 const listSurveyRouter = require('./routes/listSurvey');
 const requestRouter = require('./routes/requests');
 const frequencyRouter = require('./routes/frequency');
+const followResultRouter = require('./routes/followResult');
 const sampleGroupsRouter = require('./routes/sampleGroups');
 
 
@@ -41,6 +42,7 @@ app.use('/answers', answersRouter);
 app.use('/listSurvey', listSurveyRouter);
 app.use('/requests', requestRouter);
 app.use('/frequency', frequencyRouter);
+app.use('/followResults', followResultRouter);
 app.use('/sampleGroups', sampleGroupsRouter);
 
 app.listen(port, () => {

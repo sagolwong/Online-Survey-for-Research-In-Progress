@@ -8,7 +8,8 @@ export default class UserProfile extends Component {
         super(props);
 
         this.onChangeGender = this.onChangeGender.bind(this);
-        this.onChangeAge = this.onChangeAge.bind(this);
+        this.onChangeJob = this.onChangeJob.bind(this);
+        this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
 
@@ -16,12 +17,14 @@ export default class UserProfile extends Component {
             users: {},
             data: [],
             gender: "",
-            age: 0
+            job: "",
+            description: ""
+
         };
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5000/users/5dca538c955945213c0d52ff')
+        axios.get('http://localhost:5000/users/5dc9a42c824eb44fe43c8f94')
             .then(response => {
                 this.setState({
                     users: response.data
@@ -39,18 +42,25 @@ export default class UserProfile extends Component {
         })
     }
 
-    onChangeAge(e) {
+    onChangeJob(e) {
         this.setState({
-            age: e.target.value
+            job: e.target.value
+        })
+    }
+
+    onChangeDescription(e) {
+        this.setState({
+            description: e.target.value
         })
     }
 
     onSubmit(e) {
         e.preventDefault();
-        const userId = "5dd404efa2ee2a1478c79d5a";
+        const userId = "5e37c88484824b4da85b9e76";
         this.state.data[0] = userId;
         this.state.data[1] = this.state.gender;
-        this.state.data[2] = this.state.age;
+        this.state.data[2] = this.state.job;
+        this.state.data[3] = this.state.description;
 
         var request = {
             userId: "5e203ad29a267a2818ee1996",
@@ -61,7 +71,7 @@ export default class UserProfile extends Component {
         console.log(request);
 
         axios.post('http://localhost:5000/requests/create', request)
-          .then(res => console.log(res.data));
+            .then(res => console.log(res.data));
 
         /*axios.post('http://localhost:5000/users/upgrade/5dca538c955945213c0d52ff', upgrade)
           .then(res => console.log(res.data));*/
@@ -86,36 +96,89 @@ export default class UserProfile extends Component {
                         </Card>
                     </Col>
                     <Col>
-                        <Card>
-                            <div className="layout_user_profile2">
-                                <CardTitle>เพิ่มข้อมูลเพื่ออัพเกรดเป็นผู้วิจัย</CardTitle>
-                                <form onSubmit={this.onSubmit}>
-                                    <div className="form-group">
-                                        <label>gender: </label>
-                                        <select ref="genderInput"
-                                            required
-                                            className="form-control"
-                                            value={this.state.gender}
-                                            onChange={this.onChangeGender}>
-                                            <option value="male">male</option>
-                                            <option value="female">female</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>age: </label>
-                                        <input type="number"
-                                            required
-                                            className="form-control"
-                                            value={this.state.age}
-                                            onChange={this.onChangeAge}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <input type="submit" value="อัพเกรด" className="btn btn-info" />
-                                    </div>
-                                </form>
-                            </div>
-                        </Card>
+                        {this.state.users.role === "Responder" ?
+                            <Card>
+                                <div className="layout_user_profile2">
+                                    <CardTitle>เพิ่มข้อมูลเพื่ออัพเกรดเป็นผู้วิจัย</CardTitle>
+                                    <form onSubmit={this.onSubmit}>
+                                        <div className="form-group">
+                                            <label>เพศ: </label>
+                                            <select ref="genderInput"
+                                                required
+                                                className="form-control"
+                                                value={this.state.gender}
+                                                onChange={this.onChangeGender}>
+                                                <option value="male">male</option>
+                                                <option value="female">female</option>
+                                            </select>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>อาชีพ: </label>
+                                            <select ref="jobInput"
+                                                required
+                                                className="form-control"
+                                                value={this.state.job}
+                                                onChange={this.onChangeJob}>
+                                                <option value="นักเรียน">นักเรียน</option>
+                                                <option value="นิสิต/นักศึกษา">นิสิต/นักศึกษา</option>
+                                                <option value="ข้าราชการ/รัฐวิสาหกิจ">ข้าราชการ/รัฐวิสาหกิจ</option>
+                                                <option value="พนักงานบริษัทเอกชน">พนักงานบริษัทเอกชน</option>
+                                                <option value="ธุรกิจส่วนตัว">ธุรกิจส่วนตัว</option>
+                                                <option value="รับจ้าง">รับจ้าง</option>
+                                                <option value="แม่บ้าน/พ่อบ้าน">แม่บ้าน/พ่อบ้าน</option>
+                                            </select>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>ทำไมถึงอยากยกระดับเป็นผู้วิจัยจงอธิบาย: </label>
+                                            <textarea ref="descriptionInput"
+                                                required
+                                                className="form-control"
+                                                value={this.state.description}
+                                                onChange={this.onChangeDescription}
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <input type="submit" value="อัพเกรด" className="btn btn-info" />
+                                        </div>
+                                    </form>
+                                </div>
+                            </Card> :
+                            <Card style={{
+                                height: "250px",
+                                width: "400px"
+                            }}>
+                                <div className="layout_user_profile2">
+                                    <h4 style={{ textAlign:"center" }} >รายละเอียดผู้ใช้</h4>
+                                    <br></br>
+                                    <Row>
+                                        <Col>
+                                            <label>เพศ: </label>
+                                        </Col>
+                                        <Col>
+                                            <p>ชาย</p>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col>
+                                            <label>อาชีพ: </label>
+                                        </Col>
+                                        <Col>
+                                            <p>นิสิต/นักศึกษา</p>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col>
+                                            <label>ทำไมถึงอยากยกระดับเป็นผู้วิจัยจงอธิบาย: </label>
+                                        </Col>
+                                        <Col>
+                                            <p>ใช้งานเว็บทำงานวิจัย</p>
+                                        </Col>
+                                    </Row>
+                                </div>
+
+                            </Card>
+                        }
+
                     </Col>
                 </Row>
             </div>

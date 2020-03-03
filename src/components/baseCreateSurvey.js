@@ -10,8 +10,10 @@ class baseCreateSurvey extends Component {
         super(props);
         this.state = {
             project: {},
+            survey: [],
             sampleGroup: {}
         }
+        this.showForm = this.showForm.bind(this);
     }
 
     async componentDidMount() {
@@ -72,7 +74,7 @@ class baseCreateSurvey extends Component {
                 description: this.props.test.description,
                 shareTo: this.props.test.shareTo,
                 wantName: this.props.test.wantName,
-                haveTwoGroup: this.props.test.haveTwoGroup,
+                haveGroup: this.props.test.haveGroup,
                 names: this.props.test.names,
                 listNameExperiments: this.props.test.listNameExperiments,
                 listNameControls: this.props.test.listNameControls,
@@ -80,14 +82,39 @@ class baseCreateSurvey extends Component {
                 doOnce: this.props.test.doOnce,
                 openAndCloseTimes: this.props.test.openAndCloseTimes,
                 qprocess: this.props.test.qprocess,
+                builtIns: this.props.test.builtIns,
                 data: this.props.test.data
             }
             console.log(data);
             axios.post(`http://localhost:5000/surveys/create`, data)
-                .then(res => console.log(res.data));
+                .then(res => {
+                    console.log(res.data)
+                    axios.get(`http://localhost:5000/surveys/${this.state.project._id}/` + data.nameSurvey)
+                        .then(response => {
+                            if (this.props.test.dateToDo !== undefined) {
+                                const frequency = {
+                                    surveyId: response.data[0]._id,
+                                    listTimeToDo: this.props.test.dateToDo
+                                }
+                                axios.post(`http://localhost:5000/frequency/create`, frequency)
+                                    .then(res => console.log(res.data))
+                            }
+
+                            console.log(response.data[0]._id);
+                            window.location = '/survey-management/' + response.data[0]._id;
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        })
+                });
+
+
+            //window.location = '/survey-management/' + ;
 
         }
     }
+
+
 
     render() {
         return (

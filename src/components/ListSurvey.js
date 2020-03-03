@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Card } from 'reactstrap'
+//import axios from 'axios';
 
 export default class ListSurvey extends Component {
     constructor(props) {
@@ -8,6 +9,12 @@ export default class ListSurvey extends Component {
         this.goToManageSurvey = this.goToManageSurvey.bind(this);
         
     }
+    /*componentDidMount(){
+        if(this.props.survey.nameSurvey==="ทดสอบ"){
+            axios.delete(`http://localhost:5000/surveys/`+this.props.survey._id)
+                .then(res => console.log(res.data));
+        }
+    }*/
 
     goToManageSurvey(){
         const surveyId = this.props.survey._id;

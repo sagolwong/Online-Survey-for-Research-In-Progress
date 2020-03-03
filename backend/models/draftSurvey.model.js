@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const surveySchema = new Schema({
+const draftSurveySchema = new Schema({
     projectId: {
         type: String,
         required: true,
@@ -27,52 +27,49 @@ const surveySchema = new Schema({
     haveGroup: {
         type: Boolean,
         required: true
-    },
-    names: Array,
-    listNameExperiments: Array,
-    listNameControls: Array,
-    frequency: {
+    }, frequency: {
         amount: {
-            type: Number
+            type: Number,
+            required: true
         },
         unitsOfTime: {
-            type: String
+            type: String,
+            required: true
         }
     }, doOnce: {
         type: Boolean,
         required: true
     }, openAndCloseTimes: {
-        start:{
+        start: {
             day: {
-                type:Number,
+                type: Number,
                 required: true
             }, month: {
-                type:Number,
+                type: Number,
                 required: true
             }, year: {
-                type:Number,
+                type: Number,
                 required: true
             }
-        }, end:{
+        }, end: {
             day: {
-                type:Number,
+                type: Number,
                 required: true
             }, month: {
-                type:Number,
+                type: Number,
                 required: true
             }, year: {
-                type:Number,
+                type: Number,
                 required: true
             }
         }
-    }, qprocess: Array,
-    builtIns:Array,
+    }, builtIns: Array,
     data: {
         type: Object,
         required: true
     }
 });
 
-const Survey = mongoose.model('Survey', surveySchema);
+const DraftSurvey = mongoose.model('DraftSurvey', draftSurveySchema);
 
-module.exports = Survey;
+module.exports = DraftSurvey;

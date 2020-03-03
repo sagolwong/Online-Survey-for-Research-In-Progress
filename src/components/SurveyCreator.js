@@ -40,22 +40,63 @@ widgets.bootstrapslider(SurveyKo);
 class SurveyCreator extends Component {
   surveyCreator;
   componentDidMount() {
-    let options = { showEmbededSurveyTab: true };
+    let options = { showEmbededSurveyTab: false };
     this.surveyCreator = new SurveyJSCreator.SurveyCreator(
       "surveyCreatorContainer",
       options
     );
     this.surveyCreator.saveSurveyFunc = this.saveMySurvey;
     console.log(JSON.parse(JSON.stringify(this.surveyCreator.text)));
+    if (this.props.test.data[0] !== undefined) {
+      window.localStorage.setItem("LocalStorageSurvey", this.props.test.data);
+      this.surveyCreator.text = window.localStorage.getItem("LocalStorageSurvey") || "";
+    }
+    console.log(window.localStorage.getItem("LocalStorageSurvey") || "");
+    window.localStorage.removeItem("LocalStorageSurvey");
   }
+
+  backToStep1() {
+    this.props.dispatch({
+      type: 'BACKTOSTEP1'
+    });
+  }
+
   render() {
-    return <div id="surveyCreatorContainer" />
+    return (
+      <div>
+        <div id="surveyCreatorContainer" /><br></br>
+        <Button color="danger" onClick={this.backToStep1.bind(this)}>ย้อนกลับ</Button>
+        <Button color="info" onClick={this.saveMySurvey}>ต่อไป</Button>
+      </div>
+    )
   }
   saveMySurvey = () => {
     console.log(JSON.parse(JSON.stringify(this.surveyCreator.text)));
-    let builtIns;
+    //window.localStorage.setItem("LocalStorageSurvey", this.surveyCreator.text);
+    let builtIns = [];
     let formSurvey;
-    if (this.props.builtIns.builtInWidgetGender && this.props.builtIns.builtInWidgetAges) {
+
+    if (this.props.builtIns.builtInWidgetGender) {
+      builtIns = builtIns.concat({ builtInWidget: "gender" })
+    }
+    if (this.props.builtIns.builtInWidgetAges) {
+      builtIns = builtIns.concat({ builtInWidget: "ages" })
+    }
+    if (this.props.builtIns.builtInWidgetStatus) {
+      builtIns = builtIns.concat({ builtInWidget: "status" })
+    }
+    if (this.props.builtIns.builtInWidgetEducation) {
+      builtIns = builtIns.concat({ builtInWidget: "education" })
+    }
+    if (this.props.builtIns.builtInWidgetJob) {
+      builtIns = builtIns.concat({ builtInWidget: "job" })
+    }
+    if (this.props.builtIns.builtInWidgetIncome) {
+      builtIns = builtIns.concat({ builtInWidget: "income" })
+    }
+    console.log(builtIns)
+
+    /*if (this.props.builtIns.builtInWidgetGender && this.props.builtIns.builtInWidgetAges) {
       builtIns = [
         { builtInWidget: "gender" },
         { builtInWidget: "ages" }
@@ -68,9 +109,9 @@ class SurveyCreator extends Component {
       builtIns = [
         { builtInWidget: "ages" }
       ]
-    }
+    }*/
 
-    if (builtIns) {
+    if (builtIns[0] !== undefined) {
       formSurvey = {
         data: JSON.parse(JSON.stringify(this.surveyCreator.text)),
         builtIns: builtIns
@@ -80,13 +121,12 @@ class SurveyCreator extends Component {
         data: JSON.parse(JSON.stringify(this.surveyCreator.text))
       }
     }
-
+    console.log(formSurvey)
 
     this.props.dispatch({
       type: 'ADD_STEP2',
       formSurvey
     });
-
 
     console.log(this.props.test)
   };

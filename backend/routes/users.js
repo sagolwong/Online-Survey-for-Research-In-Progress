@@ -31,11 +31,11 @@ router.route('/create').post((req, res) => {
   const role = "Responder";
 
   const newUser = new User({
-      email,
-      password,
-      firstname,
-      lastname,
-      role
+    email,
+    password,
+    firstname,
+    lastname,
+    role
   });
 
   newUser.save()
@@ -61,7 +61,7 @@ router.route('/upgrade/:id').post((req, res) => {
       user.gender = req.body.gender;
       user.age = Number(req.body.age);
       user.role = "Researcher";
-      
+
 
       user.save()
         .then(() => res.json('User upgrade!'))
@@ -75,7 +75,7 @@ router.route('/edit/:id').post((req, res) => {
     .then(user => {
       user.recentProjects = req.body.recentProjects;
       user.recentOtherSurveys = req.body.recentOtherSurveys;
-      
+
 
       user.save()
         .then(() => res.json('RecentProject&OtherSurvey update!'))

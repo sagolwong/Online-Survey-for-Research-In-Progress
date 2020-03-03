@@ -118,7 +118,7 @@ export default class ProjectManagement extends Component {
     showGroupSampleGroup() {
         return (
             this.state.sampleGroups.map(res => {
-                return <ListSampleGroup sampleGroup={res} projectId={this.props.match.params.projectId} />
+                return <ul><ListSampleGroup sampleGroup={res} projectId={this.props.match.params.projectId} /></ul>
             })
         )
     }
