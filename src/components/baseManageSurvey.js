@@ -58,7 +58,7 @@ class baseManageSurvey extends Component {
     showComponent() {
         if (this.state.manage === 1) return <SurveyProfile surveyId={this.props.match.params.surveyId} />
         else if (this.state.manage === 2) return <SurveyManagement surveyId={this.props.match.params.surveyId} />
-        //else if (this.state.manage === 3) return <FollowResult />
+        else if (this.state.manage === 3) return <FollowResult surveyId={this.props.match.params.surveyId} />
         else if (this.state.manage === 4) return <Feedback surveyId={this.props.match.params.surveyId} />
     }
 
@@ -87,6 +87,7 @@ class baseManageSurvey extends Component {
                         <div style={{marginLeft: "2rem"}}>
                             <h3 onClick={this.changeProfile}>รายละเอียด</h3><br></br>
                             <h3 onClick={this.changeManage}>การจัดการ</h3><br></br>
+                            <h3 onClick={this.changeFollow}>ติดตามผล</h3><br></br>
                             <h3 onClick={this.changeFeedback}>วิเคราะห์ผลลัพธ์</h3><br></br>
                         </div>
 

@@ -17,7 +17,7 @@ class InviteToGroup extends Component {
             checkGroup: true,
             already: false,
             frequency: [],
-            listTimeToDo:[],
+            listTimeToDo: [],
             nowDate: date,
             nowMonth: month,
             nowYear: year
@@ -136,18 +136,27 @@ class InviteToGroup extends Component {
             axios.post(`http://localhost:5000/requests/create`, request)
                 .then(res => { console.log(res.data) });
 
+            const followResult = {
+                surveyId: surveyId,
+                userId: userId,
+                frequencyId: this.state.frequency[0]._id
+            }
+            console.log(followResult);
+            axios.post(`http://localhost:5000/followResults/create`, followResult)
+                .then(res => { console.log(res.data) });
+
         }
-        if(await this.state.listTimeToDo[0] !== undefined){
+        if (await this.state.listTimeToDo[0] !== undefined) {
             this.state.listTimeToDo.map(time => {
                 if (time.day === this.state.nowDate && time.month === this.state.nowMonth && time.year === this.state.nowYear) {
                     check = true;
                 }
             })
-            
+
         }
-        if(await check) window.location = `/online-survey-check/${surveyId}`;
-        else window.location =  `/`;
-        
+        if (await check) window.location = `/online-survey-check/${surveyId}`;
+        else window.location = `/`;
+
     }
 
     goToAgreement() {

@@ -14,6 +14,8 @@ export default class ListFrequencyRequest extends Component {
         this.state = {
             survey: {},
             frequency: [],
+            followResult: [],
+            checkDoneDate: false,
             nowDate: date,
             nowMonth: month,
             nowYear: year
@@ -22,11 +24,13 @@ export default class ListFrequencyRequest extends Component {
         this.agree = this.agree.bind(this);
         this.disagree = this.disagree.bind(this);
     }
-    componentDidMount() {
+    async componentDidMount() {
         //รับค่า user แบบลักไก่
+        const userId = "5dc9a42c824eb44fe43c8f94";
         const surveyId = this.props.frequencyRequest.data[0];
         const frequencyId = this.props.frequencyRequest.data[1];
-        axios.get('http://localhost:5000/surveys/find/' + surveyId)
+        const date = this.state.nowDate + "-" + this.state.nowMonth + "-" + this.state.nowYear
+        await axios.get('http://localhost:5000/surveys/find/' + surveyId)
             .then(response => {
                 this.setState({
                     survey: response.data
@@ -37,7 +41,7 @@ export default class ListFrequencyRequest extends Component {
                 console.log(error);
             })
 
-        axios.get('http://localhost:5000/frequency/' + frequencyId)
+        await axios.get('http://localhost:5000/frequency/' + frequencyId)
             .then(response => {
                 this.setState({
                     frequency: response.data.listTimeToDo
@@ -49,6 +53,27 @@ export default class ListFrequencyRequest extends Component {
                 console.log(error);
             })
 
+        await axios.get(`http://localhost:5000/followResults/find/${surveyId}/${userId}`)
+            .then(response => {
+                this.setState({
+                    followResult: response.data
+                })
+                console.log(this.state.followResult[0]);
+
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+
+        if (await this.state.followResult[0] !== undefined) {
+            this.state.followResult[0].follow.map(dates => {
+                if (dates === date) {
+                    this.setState({ checkDoneDate: true })
+                }
+            })
+        }
+        console.log(this.state.checkDoneDate);
+
     }
 
     checkFrequency() {
@@ -56,25 +81,29 @@ export default class ListFrequencyRequest extends Component {
             return (
                 this.state.frequency.map(time => {
                     if (time.day === this.state.nowDate && time.month === this.state.nowMonth && time.year === this.state.nowYear) {
-                        return (
-                            <div className="sec">
-                                <Row>
-                                    <p>วันนี้คุณมีนัดทำแบบสอบถาม : </p>
-                                    <div><a href="/">{this.state.survey.nameSurvey}</a></div>
-                                </Row>
-                                <Row>
-                                    <Card body>
-                                        <CardTitle><a href="/">{this.state.survey.nameSurvey}</a></CardTitle>
-                                        <CardText>{this.state.survey.description}</CardText>
-                                        <Row>
-                                            <Col><Button color="primary" size="lg" block onClick={this.agree}>ทำ</Button></Col>
-                                            <Col><Button color="danger" size="lg" block onClick={this.disagree}>ไม่ทำ</Button></Col>
-                                        </Row>
+                        if (this.state.checkDoneDate) return "";
+                        else {
+                            return (
+                                <div className="sec">
+                                    <Row>
+                                        <p>วันนี้คุณมีนัดทำแบบสอบถาม : </p>
+                                        <div><a href="/">{this.state.survey.nameSurvey}</a></div>
+                                    </Row>
+                                    <Row>
+                                        <Card body>
+                                            <CardTitle><a href="/">{this.state.survey.nameSurvey}</a></CardTitle>
+                                            <CardText>{this.state.survey.description}</CardText>
+                                            <Row>
+                                                <Col><Button color="primary" size="lg" block onClick={this.agree}>ทำ</Button></Col>
+                                                <Col><Button color="danger" size="lg" block onClick={this.disagree}>ไม่ทำ</Button></Col>
+                                            </Row>
 
-                                    </Card>
-                                </Row>
-                            </div>
-                        )
+                                        </Card>
+                                    </Row>
+                                </div>
+                            )
+                        }
+
                     }
                 })
             )
@@ -84,7 +113,7 @@ export default class ListFrequencyRequest extends Component {
     }
 
     async agree() {
-        const userId = "5e1976f8652e4342fc6c0223";
+        //const userId = "5e1976f8652e4342fc6c0223";
         const surveyId = this.props.frequencyRequest.data[0];
         /*await axios.delete('http://localhost:5000/requests/' + this.props.frequencyRequest._id)
             .then(res => console.log(res.data));*/

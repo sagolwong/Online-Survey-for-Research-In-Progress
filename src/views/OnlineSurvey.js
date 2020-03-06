@@ -55,6 +55,7 @@ class OnlineSurvey extends Component {
             survey: {},
             answer: [],
             listSurvey: [],
+            followResult: [],
             checkDoNot: true,
             checkHaveGroup: false,
             modal: false,
@@ -151,6 +152,21 @@ class OnlineSurvey extends Component {
             .catch((error) => {
                 console.log(error);
             })
+        //ดึงข้อมูลจาก followResult
+        if(await this.state.survey.shareTo === "open" || this.state.survey.shareTo === "close"){
+            axios.get(`http://localhost:5000/followResults/find/${surveyId}/${userId}`)
+            .then(response => {
+                this.setState({
+                    followResult: response.data
+                })
+                console.log(this.state.followResult[0]);
+
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+        }
+         
 
 
         //วน loop หาว่ามีการเพิ่ม surveyId ลง listSurvey ของ userId นี้แล้วหรือไม่
@@ -649,7 +665,7 @@ class OnlineSurvey extends Component {
             }
         }*/
     }
-    async sendData(){
+    async sendData() {
         const surveyId = this.props.match.params.surveyId;
         const userId = "5e1976f8652e4342fc6c0223";
 
@@ -750,6 +766,18 @@ class OnlineSurvey extends Component {
                 recentProjects: this.state.profile.recentProjects
             }
             await axios.post(`http://localhost:5000/users/edit/${userId}`, editRecentProject)
+                .then(res => console.log(res.data));
+        }
+        if(await this.state.followResult[0] !== undefined){
+            var follow = [];
+            var date = this.state.cdate+"-"+this.state.cmonth+"-"+this.state.cyear;
+            console.log(date);
+            follow = this.state.followResult[0].follow.concat(date);
+            const followResult ={
+                follow: follow
+            }
+
+            axios.post(`http://localhost:5000/followResults/edit/${this.state.followResult[0]._id}`, followResult)
                 .then(res => console.log(res.data));
         }
     }

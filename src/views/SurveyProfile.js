@@ -32,6 +32,7 @@ export default class SurveyProfile extends Component {
                 <Card>
                     <CardTitle>ชื่อแบบสอบถาม : {this.state.survey.nameSurvey}</CardTitle>
                     <CardText>รายละเอียดแบบสอบถาม : {this.state.survey.description}</CardText>
+                    <CardText>ชนิดแบบสอบถาม : {this.state.survey.shareTo}</CardText>
                 </Card>
             </div>
         )

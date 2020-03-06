@@ -172,6 +172,14 @@ class CheckBeforeDo extends Component {
             axios.post(`http://localhost:5000/requests/create`, request)
                 .then(res => { console.log(res.data) });
 
+
+            const followResult = {
+                surveyId: surveyId,
+                userId: userId,
+                frequencyId: this.state.frequency[0]._id
+            }
+            axios.post(`http://localhost:5000/followResults/create`, followResult)
+                .then(res => { console.log(res.data) });
         }
         if (await this.state.listTimeToDo[0] !== undefined) {
             this.state.listTimeToDo.map(time => {

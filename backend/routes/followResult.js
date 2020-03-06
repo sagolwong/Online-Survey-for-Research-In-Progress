@@ -1,5 +1,5 @@
 const router = require('express').Router();
-let FollowResult = require('../models/followResult.model');
+let FollowResult = require('../models/follow.model');
 
 router.route('/').get((req, res) => {
     FollowResult.find()
@@ -22,7 +22,7 @@ router.route('/create').post((req, res) => {
 
   newFollowResult.save()
     .then(() => res.json('FollowResult create!'))
-    .catch(err => res.status(400).json('Error: ' + err));
+    .catch(err => res.json('Error: ' + err));
 });
 
 router.route('/:id').get((req, res) => {
@@ -33,6 +33,11 @@ router.route('/:id').get((req, res) => {
 
 router.route('/find/:surveyId/:userId').get((req, res) => {
     FollowResult.find({ surveyId: req.params.surveyId,userId: req.params.userId })
+    .then(followResults => res.json(followResults))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+router.route('/findS/:surveyId').get((req, res) => {
+    FollowResult.find({ surveyId: req.params.surveyId })
     .then(followResults => res.json(followResults))
     .catch(err => res.status(400).json('Error: ' + err));
 });
