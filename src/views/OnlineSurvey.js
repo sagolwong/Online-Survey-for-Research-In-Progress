@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import axios from 'axios';
-import ReactEncrypt from 'react-encrypt'
+import SimpleCrypto from "simple-crypto-js";
 import { Input, Modal, ModalHeader, ModalBody, Row, Col, FormGroup, Label, ModalFooter, Button } from 'reactstrap'
 import * as Survey from "survey-react";
 import "survey-react/survey.css";
@@ -22,7 +22,6 @@ import "jquery-bar-rating";
 import * as widgets from "surveyjs-widgets";
 
 import "icheck/skins/square/blue.css";
-import EncryptAnswer from '../components/EncryptAnswer';
 window["$"] = window["jQuery"] = $;
 require("icheck");
 
@@ -56,6 +55,7 @@ class OnlineSurvey extends Component {
             answer: [],
             listSurvey: [],
             followResult: [],
+            frequency: [],
             checkDoNot: true,
             checkHaveGroup: false,
             modal: false,
@@ -65,7 +65,7 @@ class OnlineSurvey extends Component {
             checkEncrypt: false,
             encryptAnswer: false,
             checkSurvey: false,
-            encryptKey: "",
+            secretKey: "",
             title: "",
             pages: [],
             cdate: date,
@@ -79,6 +79,7 @@ class OnlineSurvey extends Component {
             eyear: 0,
         };
         this.onComplete = this.onComplete.bind(this);
+        this.encryptAnswer = this.encryptAnswer.bind(this);
     }
 
     async componentDidMount() {
@@ -167,9 +168,18 @@ class OnlineSurvey extends Component {
                 .catch((error) => {
                     console.log(error);
                 })
+
+            axios.get('http://localhost:5000/frequency/find/' + surveyId)
+                .then(response => {
+                    this.setState({
+                        frequency: response.data
+                    })
+                    console.log(this.state.frequency);
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
         }
-
-
 
         //วน loop หาว่ามีการเพิ่ม surveyId ลง listSurvey ของ userId นี้แล้วหรือไม่
         if (await this.state.listSurvey[0] !== undefined) {
@@ -402,7 +412,7 @@ class OnlineSurvey extends Component {
             } else {
                 return "แบบสอบถามสามารถทำได้ครั้งเดียว"
             }
-        }else{
+        } else {
             return (
                 <div>
                     กำลังโหลด....
@@ -423,8 +433,28 @@ class OnlineSurvey extends Component {
         const name = this.props.match.params.name;
         var resultAsString = result.data;
 
-
-        if (await this.state.survey.shareTo === "close" || this.state.survey.shareTo === "open") {
+        if (await this.state.frequency[0] !== undefined) {
+            this.setState({
+                modal: true
+            })
+            if (this.state.survey.wantName) {
+                this.setState({
+                    resultAsString: {
+                        name: this.state.profile.firstname + " " + this.state.profile.lastname,
+                        noFrequency: this.state.cdate + "-" + this.state.cmonth + "-" + this.state.cyear,
+                        resultAsString
+                    }
+                })
+            } else {
+                this.setState({
+                    resultAsString: {
+                        noFrequency: this.state.cdate + "-" + this.state.cmonth + "-" + this.state.cyear,
+                        resultAsString
+                    }
+                })
+            }
+            console.log(this.state.resultAsString);
+        } else if (await this.state.survey.shareTo === "close" || this.state.survey.shareTo === "open") {
             //var resultAsString = result.data;
             this.setState({
                 modal: true
@@ -436,7 +466,7 @@ class OnlineSurvey extends Component {
                         resultAsString
                     }
                 })
-            }else {
+            } else {
                 this.setState({
                     resultAsString: {
                         resultAsString
@@ -453,7 +483,7 @@ class OnlineSurvey extends Component {
                     },
                     checkEncrypt: true
                 })
-            }else {
+            } else {
                 this.setState({
                     resultAsString: {
                         resultAsString
@@ -705,7 +735,7 @@ class OnlineSurvey extends Component {
     }
     onChangePassword(e) {
         this.setState({
-            encryptKey: e.target.value
+            secretKey: e.target.value
         });
     }
     confirm() {
@@ -714,22 +744,60 @@ class OnlineSurvey extends Component {
                 modal: false,
                 checkEncrypt: true
             })
-        }/* else {
-           this.setState({
-               encryptAnswer: true,
-               modal: false
-           })
-        }*/
+        } else {
+            this.setState({
+                modal: false
+            })
+            this.encryptAnswer()
+        }
     }
     encryptAnswer() {
-        return (
-            <ReactEncrypt
-                encryptKey={this.state.encryptKey}
-            >
-                <EncryptAnswer answer={this.state.resultAsString} />
-            </ReactEncrypt>
-        )
+        if (this.state.secretKey !== "") {
+            var simpleCrypto = new SimpleCrypto(this.state.secretKey);
+            var head = "surveyJS";
+
+            if (this.state.frequency[0] !== undefined) {
+                if (this.state.survey.wantName) {
+                    this.setState({
+                        resultAsString: {
+                            head: simpleCrypto.encrypt(head),
+                            name: simpleCrypto.encrypt(this.state.resultAsString.name),
+                            noFrequency: simpleCrypto.encrypt(this.state.resultAsString.noFrequency),
+                            resultAsString: simpleCrypto.encrypt(this.state.resultAsString.resultAsString)
+                        }, checkEncrypt: true
+                    })
+                } else {
+                    this.setState({
+                        resultAsString: {
+                            head: simpleCrypto.encrypt(head),
+                            noFrequency: simpleCrypto.encrypt(this.state.resultAsString.noFrequency),
+                            resultAsString: simpleCrypto.encrypt(this.state.resultAsString.resultAsString)
+                        }, checkEncrypt: true
+                    })
+                }
+                console.log(this.state.resultAsString);
+            } else if (this.state.survey.shareTo === "close" || this.state.survey.shareTo === "open") {
+                if (this.state.survey.wantName) {
+                    this.setState({
+                        resultAsString: {
+                            head: simpleCrypto.encrypt(head),
+                            name: simpleCrypto.encrypt(this.state.resultAsString.name),
+                            resultAsString: simpleCrypto.encrypt(this.state.resultAsString.resultAsString)
+                        }, checkEncrypt: true
+                    })
+                } else {
+                    this.setState({
+                        resultAsString: {
+                            head: simpleCrypto.encrypt(head),
+                            resultAsString: simpleCrypto.encrypt(this.state.resultAsString.resultAsString)
+                        }, checkEncrypt: true
+                    })
+                }
+                console.log(this.state.resultAsString);
+            }
+        }
     }
+
 
     render() {
         //อาจจะติดตรงที่ มันไม่มี "" หรือป่าว?
@@ -806,12 +874,11 @@ class OnlineSurvey extends Component {
                         {this.state.wantEncrypt ? <Input type="password" placeholder="กรุณาใส่รหัสผ่านเพื่อใช้ปกปิดข้อมูลของท่าน" onChange={this.onChangePassword.bind(this)} /> : ""}
                     </ModalBody>
                     <ModalFooter>
-                        {(this.state.wantEncrypt && (this.state.password !== "")) || this.state.dontWantEncrypt ?
+                        {(this.state.wantEncrypt && (this.state.secretKey !== "")) || this.state.dontWantEncrypt ?
                             <Button color="info" onClick={this.confirm.bind(this)}>ยืนยัน</Button> :
                             <Button color="info" onClick={this.confirm.bind(this)} disabled>ยืนยัน</Button>}
                     </ModalFooter>
                 </Modal>
-                {console.log(this.props.test.checkEncrypt)}
                 {this.state.checkEncrypt ? this.sendData() : ""}
             </div>
         )

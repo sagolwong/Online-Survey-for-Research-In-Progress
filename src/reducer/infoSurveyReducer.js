@@ -123,13 +123,6 @@ const infoSurveyReducer = (state = initialState, action) => {
             }
             return state;
 
-        /*case 'SURVEY_CHECK_ENCRYPT':
-            state = {
-                checkEncrypt: true,
-                encryptAnswer: action.data
-            }
-            return state;*/
-
         case 'BACKTOSTEP1':
             state = {
                 projectId: state.projectId,
