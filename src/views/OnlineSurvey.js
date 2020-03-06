@@ -64,6 +64,7 @@ class OnlineSurvey extends Component {
             resultAsString: {},
             checkEncrypt: false,
             encryptAnswer: false,
+            checkSurvey: false,
             encryptKey: "",
             title: "",
             pages: [],
@@ -106,6 +107,7 @@ class OnlineSurvey extends Component {
                     edate: response.data.openAndCloseTimes.end.day,
                     emonth: response.data.openAndCloseTimes.end.month,
                     eyear: response.data.openAndCloseTimes.end.year,
+                    checkSurvey: true
                 })
                 console.log(this.state.survey);
                 console.log(this.state.title);
@@ -153,20 +155,20 @@ class OnlineSurvey extends Component {
                 console.log(error);
             })
         //ดึงข้อมูลจาก followResult
-        if(await this.state.survey.shareTo === "open" || this.state.survey.shareTo === "close"){
+        if (await this.state.survey.shareTo === "open" || this.state.survey.shareTo === "close") {
             axios.get(`http://localhost:5000/followResults/find/${surveyId}/${userId}`)
-            .then(response => {
-                this.setState({
-                    followResult: response.data
-                })
-                console.log(this.state.followResult[0]);
+                .then(response => {
+                    this.setState({
+                        followResult: response.data
+                    })
+                    console.log(this.state.followResult[0]);
 
-            })
-            .catch((error) => {
-                console.log(error);
-            })
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
         }
-         
+
 
 
         //วน loop หาว่ามีการเพิ่ม surveyId ลง listSurvey ของ userId นี้แล้วหรือไม่
@@ -195,329 +197,218 @@ class OnlineSurvey extends Component {
     }
 
     showSurvey() {
-        console.log("sdate:" + this.state.sdate);
-        console.log("smonth:" + this.state.smonth);
-        console.log("syear:" + this.state.syear);
-        console.log("edate:" + this.state.edate);
-        console.log("emonth:" + this.state.emonth);
-        console.log("eyear:" + this.state.eyear);
-        if ((this.state.survey.haveGroup && this.state.checkHaveGroup) || !this.state.survey.haveGroup) {
-            if ((this.state.cyear <= this.state.syear && (this.state.cmonth < this.state.smonth || (this.state.cdate < this.state.sdate && this.state.cdate >= this.state.sdate))) || (this.state.cmonth === this.state.smonth && this.state.cdate < this.state.sdate)) {
-                return (
-                    <div>
-                        ยังไม่ถึงกำหนดเปิด
-                </div>
-                )
-            } else if (this.state.cyear > this.state.eyear || (this.state.cyear === this.state.eyear && (this.state.cmonth > this.state.emonth || (this.state.cmonth === this.state.emonth && this.state.cdate > this.state.edate)))) {
-                return (
-                    <div>
-                        เลยกำหนดการเปิดแล้ว
-                </div>
-                )
-            } else {
-                //อาจจะติดตรงที่ มันไม่มี "" หรือป่าว?
-                /* const title1 = "เทสๆ";
-                 const title2 = JSON.stringify(this.state.title);
-                 const title3 = this.state.title;
-                 console.log(title1);
-                 console.log(this.state.title);
-                 console.log(title2);
-                 console.log(title3);
-                 var surveyJSON = {
-                     title: title1,
-                     pages: [
-                         {
-                             name: "page1",
-                             elements: [
-                                 {
-                                     type: "matrix",
-                                     name: "q1",
-                                     title: "แบบประเมิณความวิตก",
-                                     columns: [
-                                         {
-                                             value: "1",
-                                             text: "ไม่มีเลย"
-                                         },
-                                         {
-                                             value: "2",
-                                             text: "มีบางครั้ง"
-                                         },
-                                         {
-                                             value: "3",
-                                             text: "มีค่อนข้างบ่อย"
-                                         },
-                                         {
-                                             value: "4",
-                                             text: "มีมากที่สุด"
-                                         }
-                                     ],
-                                     rows: [
-                                         "เมื่อนึกถึงความป่วยครั้งนี้ท่านรู้สึกสงบ",
-                                         "เมื่อนึกถึงความป่วยครั้งนี้ท่านรู้สึกมั่นคง"
-                                     ]
-                                 }
-                             ]
-                         }
-                     ]
-                 };*/
-                //console.log(surveyJSON);
-                if ((this.state.survey.doOnce && this.state.checkDoNot) || (!this.state.survey.doOnce)) {
-                    var elements = [];
-                    if (this.state.survey.builtIns[0] !== undefined) {
-                        this.state.survey.builtIns.map(q => {
-                            if (q.builtInWidget === "gender") {
-                                elements = elements.concat({
-                                    type: "radiogroup",
-                                    name: "widgetGender",
-                                    title: "เพศ",
-                                    choices: [
-                                        "ชาย",
-                                        "หญิง"
-                                    ],
-                                    colCount: 2
-                                })
-                            } else if (q.builtInWidget === "ages") {
-                                elements = elements.concat({
-                                    type: "radiogroup",
-                                    name: "widgetAges",
-                                    title: "อายุ",
-                                    choices: [
-                                        {
-                                            value: "low18",
-                                            text: "น้อยกว่า 18 ปี"
-                                        },
-                                        {
-                                            value: "18-23",
-                                            text: "18 - 23 ปี"
-                                        },
-                                        {
-                                            value: "24-29",
-                                            text: "24 - 29 ปี"
-                                        },
-                                        {
-                                            value: "30-35",
-                                            text: "30 - 35 ปี"
-                                        },
-                                        {
-                                            value: "36-41",
-                                            text: "36 - 41 ปี"
-                                        },
-                                        {
-                                            value: "42-47",
-                                            text: "42 - 47 ปี"
-                                        },
-                                        {
-                                            value: "48-53",
-                                            text: "48 - 53 ปี"
-                                        },
-                                        {
-                                            value: "54-60",
-                                            text: "54 - 60 ปี"
-                                        },
-                                        {
-                                            value: "more60",
-                                            text: "มากกว่า 60 ปี"
-                                        }
-                                    ]
-                                })
-                            } else if (q.builtInWidget === "status") {
-                                elements = elements.concat({
-                                    type: "radiogroup",
-                                    name: "widgetStatus",
-                                    title: "สถานภาพ",
-                                    choices: [
-                                        {
-                                            value: "single",
-                                            text: "โสด"
-                                        },
-                                        {
-                                            value: "marry",
-                                            text: "สมรส"
-                                        },
-                                        {
-                                            value: "separated",
-                                            text: "หย่าร้าง, หม้าย, แยกกันอยู่"
-                                        }
-                                    ]
-                                })
-                            } else if (q.builtInWidget === "education") {
-                                elements = elements.concat({
-                                    type: "radiogroup",
-                                    name: "widgetEducation",
-                                    title: "ระดับการศึกษาขั้นสูงสุด",
-                                    choices: [
-                                        {
-                                            value: "ประถมศึกษา",
-                                            text: "ประถมศึกษา"
-                                        },
-                                        {
-                                            value: "มัธยมศึกษา",
-                                            text: "มัธยมศึกษา"
-                                        },
-                                        {
-                                            value: "ปวช./ปวส./อนุปริญญา",
-                                            text: "ปวช./ปวส./อนุปริญญา"
-                                        },
-                                        {
-                                            value: "ปริญญาตรี",
-                                            text: "ปริญญาตรี"
-                                        },
-                                        {
-                                            value: "ปริญญาโทหรือสูงกว่า",
-                                            text: "ปริญญาโทหรือสูงกว่า"
-                                        }
-                                    ]
-                                })
-                            } else if (q.builtInWidget === "job") {
-                                elements = elements.concat({
-                                    type: "radiogroup",
-                                    name: "widgetJob",
-                                    title: "อาชีพ",
-                                    choices: [
-                                        {
-                                            value: "นักเรียน",
-                                            text: "นักเรียน"
-                                        },
-                                        {
-                                            value: "นิสิต/นักศึกษา",
-                                            text: "นิสิต/นักศึกษา"
-                                        },
-                                        {
-                                            value: "ข้าราชการ/รัฐวิสาหกิจ",
-                                            text: "ข้าราชการ/รัฐวิสาหกิจ"
-                                        },
-                                        {
-                                            value: "พนักงานบริษัทเอกชน",
-                                            text: "พนักงานบริษัทเอกชน"
-                                        },
-                                        {
-                                            value: "ธุรกิจส่วนตัว",
-                                            text: "ธุรกิจส่วนตัว"
-                                        },
-                                        {
-                                            value: "รับจ้าง",
-                                            text: "รับจ้าง"
-                                        },
-                                        {
-                                            value: "แม่บ้าน",
-                                            text: "แม่บ้าน"
-                                        }
-                                    ],
-                                    otherText: "อื่นๆ โปรดระบุ"
-                                })
-                            } else if (q.builtInWidget === "income") {
-                                elements = elements.concat({
-                                    type: "radiogroup",
-                                    name: "widgetIncome",
-                                    title: "รายได้เฉลี่ยต่อเดือน",
-                                    choices: [
-                                        {
-                                            value: "low5000",
-                                            text: "น้อยกว่า 5,000 บาท"
-                                        },
-                                        {
-                                            value: "5000-10000",
-                                            text: "5,000-10,000 บาท"
-                                        },
-                                        {
-                                            value: "10001-20000",
-                                            text: "10,001-20,000 บาท"
-                                        },
-                                        {
-                                            value: "20001-30000",
-                                            text: "20,001-30,000 บาท"
-                                        },
-                                        {
-                                            value: "more30000",
-                                            text: "มากกว่า 30,000 บาท"
-                                        }
-                                    ]
-                                })
-                            }
-                        })
-                        var widget = {
-                            name: "widget",
-                            elements
+        if (this.state.checkSurvey) {
+            if ((this.state.survey.doOnce && this.state.checkDoNot) || (!this.state.survey.doOnce)) {
+                var elements = [];
+                if (this.state.survey.builtIns[0] !== undefined) {
+                    this.state.survey.builtIns.map(q => {
+                        if (q.builtInWidget === "gender") {
+                            elements = elements.concat({
+                                type: "radiogroup",
+                                name: "widgetGender",
+                                title: "เพศ",
+                                choices: [
+                                    "ชาย",
+                                    "หญิง"
+                                ],
+                                colCount: 2
+                            })
+                        } else if (q.builtInWidget === "ages") {
+                            elements = elements.concat({
+                                type: "radiogroup",
+                                name: "widgetAges",
+                                title: "อายุ",
+                                choices: [
+                                    {
+                                        value: "low18",
+                                        text: "น้อยกว่า 18 ปี"
+                                    },
+                                    {
+                                        value: "18-23",
+                                        text: "18 - 23 ปี"
+                                    },
+                                    {
+                                        value: "24-29",
+                                        text: "24 - 29 ปี"
+                                    },
+                                    {
+                                        value: "30-35",
+                                        text: "30 - 35 ปี"
+                                    },
+                                    {
+                                        value: "36-41",
+                                        text: "36 - 41 ปี"
+                                    },
+                                    {
+                                        value: "42-47",
+                                        text: "42 - 47 ปี"
+                                    },
+                                    {
+                                        value: "48-53",
+                                        text: "48 - 53 ปี"
+                                    },
+                                    {
+                                        value: "54-60",
+                                        text: "54 - 60 ปี"
+                                    },
+                                    {
+                                        value: "more60",
+                                        text: "มากกว่า 60 ปี"
+                                    }
+                                ]
+                            })
+                        } else if (q.builtInWidget === "status") {
+                            elements = elements.concat({
+                                type: "radiogroup",
+                                name: "widgetStatus",
+                                title: "สถานภาพ",
+                                choices: [
+                                    {
+                                        value: "single",
+                                        text: "โสด"
+                                    },
+                                    {
+                                        value: "marry",
+                                        text: "สมรส"
+                                    },
+                                    {
+                                        value: "separated",
+                                        text: "หย่าร้าง, หม้าย, แยกกันอยู่"
+                                    }
+                                ]
+                            })
+                        } else if (q.builtInWidget === "education") {
+                            elements = elements.concat({
+                                type: "radiogroup",
+                                name: "widgetEducation",
+                                title: "ระดับการศึกษาขั้นสูงสุด",
+                                choices: [
+                                    {
+                                        value: "ประถมศึกษา",
+                                        text: "ประถมศึกษา"
+                                    },
+                                    {
+                                        value: "มัธยมศึกษา",
+                                        text: "มัธยมศึกษา"
+                                    },
+                                    {
+                                        value: "ปวช./ปวส./อนุปริญญา",
+                                        text: "ปวช./ปวส./อนุปริญญา"
+                                    },
+                                    {
+                                        value: "ปริญญาตรี",
+                                        text: "ปริญญาตรี"
+                                    },
+                                    {
+                                        value: "ปริญญาโทหรือสูงกว่า",
+                                        text: "ปริญญาโทหรือสูงกว่า"
+                                    }
+                                ]
+                            })
+                        } else if (q.builtInWidget === "job") {
+                            elements = elements.concat({
+                                type: "radiogroup",
+                                name: "widgetJob",
+                                title: "อาชีพ",
+                                choices: [
+                                    {
+                                        value: "นักเรียน",
+                                        text: "นักเรียน"
+                                    },
+                                    {
+                                        value: "นิสิต/นักศึกษา",
+                                        text: "นิสิต/นักศึกษา"
+                                    },
+                                    {
+                                        value: "ข้าราชการ/รัฐวิสาหกิจ",
+                                        text: "ข้าราชการ/รัฐวิสาหกิจ"
+                                    },
+                                    {
+                                        value: "พนักงานบริษัทเอกชน",
+                                        text: "พนักงานบริษัทเอกชน"
+                                    },
+                                    {
+                                        value: "ธุรกิจส่วนตัว",
+                                        text: "ธุรกิจส่วนตัว"
+                                    },
+                                    {
+                                        value: "รับจ้าง",
+                                        text: "รับจ้าง"
+                                    },
+                                    {
+                                        value: "แม่บ้าน",
+                                        text: "แม่บ้าน"
+                                    }
+                                ],
+                                otherText: "อื่นๆ โปรดระบุ"
+                            })
+                        } else if (q.builtInWidget === "income") {
+                            elements = elements.concat({
+                                type: "radiogroup",
+                                name: "widgetIncome",
+                                title: "รายได้เฉลี่ยต่อเดือน",
+                                choices: [
+                                    {
+                                        value: "low5000",
+                                        text: "น้อยกว่า 5,000 บาท"
+                                    },
+                                    {
+                                        value: "5000-10000",
+                                        text: "5,000-10,000 บาท"
+                                    },
+                                    {
+                                        value: "10001-20000",
+                                        text: "10,001-20,000 บาท"
+                                    },
+                                    {
+                                        value: "20001-30000",
+                                        text: "20,001-30,000 บาท"
+                                    },
+                                    {
+                                        value: "more30000",
+                                        text: "มากกว่า 30,000 บาท"
+                                    }
+                                ]
+                            })
                         }
+                    })
+                    var widget = {
+                        name: "widget",
+                        elements
                     }
-
-                    /*if (this.state.survey.builtIns[0] && this.state.survey.builtIns[1]) {
-                        var widget = {
-                            name: "widget",
-                            elements: [
-                                {
-                                    type: "radiogroup",
-                                    name: "widget1",
-                                    title: "เพศ",
-                                    choices: [
-                                        "ชาย",
-                                        "หญิง"
-                                    ],
-                                    colCount: 2
-                                },
-                                {
-                                    type: "text",
-                                    name: "widget2",
-                                    title: "อายุ"
-                                }
-                            ]
-                        }
-                    } else if (this.state.survey.builtIns[0]) {
-                        var widget = {
-                            name: "widget",
-                            elements: [
-                                {
-                                    type: "radiogroup",
-                                    name: "widget1",
-                                    title: "เพศ",
-                                    choices: [
-                                        "ชาย",
-                                        "หญิง"
-                                    ],
-                                    colCount: 2
-                                }
-                            ]
-                        }
-                    } else if (this.state.survey.builtIns[1]) {
-                        var widget = {
-                            name: "widget",
-                            elements: [
-                                {
-                                    type: "text",
-                                    name: "widget1",
-                                    title: "อายุ"
-                                }
-                            ]
-                        }
-                    }*/
-
-                    var form = JSON.parse(this.state.survey.data);
-                    if (this.state.survey.builtIns[0] !== undefined) {
-                        form.pages[1] = form.pages[0];
-                        form.pages[0] = widget;
-                    }
-
-                    console.log(form.pages);
-                    Survey.Survey.cssType = "default";
-                    var model = new Survey.Model(form);
-                    console.log(model);
-                    return (
-                        <div className="App">
-                            <div className="surveyjs">
-                                <h1>SurveyJS library in action:</h1>
-                                <Survey.Survey
-                                    model={model}
-                                    onComplete={this.onComplete}
-                                    onValueChanged={this.onValueChanged} />
-                            </div>
-                        </div>
-                    )
-                } else {
-                    return "แบบสอบถามสามารถทำได้ครั้งเดียว"
                 }
 
+                var form = JSON.parse(this.state.survey.data);
+                if (this.state.survey.builtIns[0] !== undefined) {
+                    form.pages[1] = form.pages[0];
+                    form.pages[0] = widget;
+                }
+
+                console.log(form.pages);
+                Survey.Survey.cssType = "default";
+                var model = new Survey.Model(form);
+                console.log(model);
+                return (
+                    <div className="App">
+                        <div className="surveyjs">
+                            <h1>SurveyJS library in action:</h1>
+                            <Survey.Survey
+                                model={model}
+                                onComplete={this.onComplete}
+                                onValueChanged={this.onValueChanged} />
+                        </div>
+                    </div>
+                )
+            } else {
+                return "แบบสอบถามสามารถทำได้ครั้งเดียว"
             }
-        } else return "ไม่มีรายชื่อตรงกับสมาชิกในโปรเจค คุณไม่สามารถทำได้"
+        }else{
+            return (
+                <div>
+                    กำลังโหลด....
+                </div>
+            )
+        }
 
     }
 
@@ -528,7 +419,7 @@ class OnlineSurvey extends Component {
     async onComplete(result) {
         //console.log("Complete! " + result);
         const surveyId = this.props.match.params.surveyId;
-        const userId = "5e1976f8652e4342fc6c0223";
+        const userId = "5dc9a42c824eb44fe43c8f94";
         const name = this.props.match.params.name;
         var resultAsString = result.data;
 
@@ -545,6 +436,12 @@ class OnlineSurvey extends Component {
                         resultAsString
                     }
                 })
+            }else {
+                this.setState({
+                    resultAsString: {
+                        resultAsString
+                    }
+                })
             }
             console.log(this.state.resultAsString);
         } else {
@@ -556,8 +453,15 @@ class OnlineSurvey extends Component {
                     },
                     checkEncrypt: true
                 })
+            }else {
+                this.setState({
+                    resultAsString: {
+                        resultAsString
+                    },
+                    checkEncrypt: true
+                })
             }
-            await this.setState({ checkEncrypt: true })
+            //await this.setState({ checkEncrypt: true })
 
         }
 
@@ -667,7 +571,7 @@ class OnlineSurvey extends Component {
     }
     async sendData() {
         const surveyId = this.props.match.params.surveyId;
-        const userId = "5e1976f8652e4342fc6c0223";
+        const userId = "5dc9a42c824eb44fe43c8f94";
 
         //เช็กว่าถ้ามีการสร้าง answer ไว้อยู่แล้วให้ update ค่าเข้าไป
         if (await this.state.answer[0] !== undefined) {
@@ -768,12 +672,12 @@ class OnlineSurvey extends Component {
             await axios.post(`http://localhost:5000/users/edit/${userId}`, editRecentProject)
                 .then(res => console.log(res.data));
         }
-        if(await this.state.followResult[0] !== undefined){
+        if (await this.state.followResult[0] !== undefined) {
             var follow = [];
-            var date = this.state.cdate+"-"+this.state.cmonth+"-"+this.state.cyear;
+            var date = this.state.cdate + "-" + this.state.cmonth + "-" + this.state.cyear;
             console.log(date);
             follow = this.state.followResult[0].follow.concat(date);
-            const followResult ={
+            const followResult = {
                 follow: follow
             }
 

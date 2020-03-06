@@ -100,7 +100,7 @@ export default class FollowResult extends Component {
     }
     showRow() {
         return (
-            this.state.follower.map((user,index)=>{
+            this.state.follower.map((user, index) => {
                 return (
                     <tr>
                         <th scope="row">{this.showName(index)}</th>
@@ -110,23 +110,26 @@ export default class FollowResult extends Component {
             })
         )
     }
-    showName(index){
+    showName(index) {
         return (
             this.state.members.map(mem => {
-                if(mem._id === this.state.follower[index].userId){
-                    return mem.firstname+" "+mem.lastname;
+                if (mem._id === this.state.follower[index].userId) {
+                    return mem.firstname + " " + mem.lastname;
                 }
             })
         )
     }
-    showTD(index){
+    showTD(index) {
         return (
             this.state.listTimeToDo.map(dates => {
-                return (
-                    this.state.follower[index].follow.map(date =>{
-                        if(dates === date) return "/";
-                    })
-                )
+                var check = false;
+                this.state.follower[index].follow.map(date => {
+                    if (dates === date) {
+                        check = true;
+                    }
+                })
+                if (check) return <td>/</td>
+                else return <td>-</td>
             })
         )
     }
@@ -134,7 +137,7 @@ export default class FollowResult extends Component {
     render() {
         return (
             <div >
-                ติดตามผล
+                <h1>ติดตามผล</h1>
                 <Table bordered>
                     <thead>
                         <tr>

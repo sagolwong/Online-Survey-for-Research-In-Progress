@@ -353,7 +353,10 @@ class CheckBeforeDo extends Component {
                                     </ul>
                                 </Card>
                                 <br></br>
-                                <Button style={{ width: "470px" }} color="info" onClick={this.goToOnlineSurveyPublic.bind(this)}>เข้าทำแบบสอบถาม</Button>
+                                {this.state.checkAgree ?
+                                    <Button style={{ width: "470px" }} color="info" onClick={this.goToOnlineSurveyPublic.bind(this)}>เข้าทำแบบสอบถาม</Button>
+                                    :
+                                    <Button style={{ width: "470px" }} color="info" onClick={this.goToOnlineSurveyPublic.bind(this)} disabled>เข้าทำแบบสอบถาม</Button>}
                             </div>
                         )
                     }
@@ -371,7 +374,8 @@ class CheckBeforeDo extends Component {
 
         } else {
             if (this.state.checkAgree) {
-                window.location = `/online-survey/${this.props.match.params.surveyId}/name=`;
+                var name = "NONAME"
+                window.location = `/online-survey/${this.props.match.params.surveyId}/name=${name}`;
             }
         }
     }
