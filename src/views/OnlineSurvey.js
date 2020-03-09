@@ -203,7 +203,7 @@ class OnlineSurvey extends Component {
             })
             console.log(this.state.checkHaveGroup);
         }
-
+        
     }
 
     showSurvey() {
@@ -440,7 +440,9 @@ class OnlineSurvey extends Component {
             if (this.state.survey.wantName) {
                 this.setState({
                     resultAsString: {
-                        name: this.state.profile.firstname + " " + this.state.profile.lastname,
+                        head: "",
+                        userId: userId,
+                        decryptKey: "",
                         noFrequency: this.state.cdate + "-" + this.state.cmonth + "-" + this.state.cyear,
                         resultAsString
                     }
@@ -448,6 +450,7 @@ class OnlineSurvey extends Component {
             } else {
                 this.setState({
                     resultAsString: {
+                        head: "",
                         noFrequency: this.state.cdate + "-" + this.state.cmonth + "-" + this.state.cyear,
                         resultAsString
                     }
@@ -462,13 +465,16 @@ class OnlineSurvey extends Component {
             if (this.state.survey.wantName) {
                 this.setState({
                     resultAsString: {
-                        name: this.state.profile.firstname + " " + this.state.profile.lastname,
+                        head: "",
+                        userId: userId,
+                        decryptKey: "",
                         resultAsString
                     }
                 })
             } else {
                 this.setState({
                     resultAsString: {
+                        head: "",
                         resultAsString
                     }
                 })
@@ -754,6 +760,8 @@ class OnlineSurvey extends Component {
     encryptAnswer() {
         if (this.state.secretKey !== "") {
             var simpleCrypto = new SimpleCrypto(this.state.secretKey);
+            const secretKey = "SJyevrus";
+            var simpleCryptoSystem = new SimpleCrypto(secretKey);
             var head = "surveyJS";
 
             if (this.state.frequency[0] !== undefined) {
@@ -761,8 +769,9 @@ class OnlineSurvey extends Component {
                     this.setState({
                         resultAsString: {
                             head: simpleCrypto.encrypt(head),
-                            name: simpleCrypto.encrypt(this.state.resultAsString.name),
+                            userId: simpleCryptoSystem.encrypt(this.state.resultAsString.userId),
                             noFrequency: simpleCrypto.encrypt(this.state.resultAsString.noFrequency),
+                            decryptKey: "",
                             resultAsString: simpleCrypto.encrypt(this.state.resultAsString.resultAsString)
                         }, checkEncrypt: true
                     })
@@ -781,7 +790,8 @@ class OnlineSurvey extends Component {
                     this.setState({
                         resultAsString: {
                             head: simpleCrypto.encrypt(head),
-                            name: simpleCrypto.encrypt(this.state.resultAsString.name),
+                            userId: simpleCryptoSystem.encrypt(this.state.resultAsString.userId),
+                            decryptKey: "",
                             resultAsString: simpleCrypto.encrypt(this.state.resultAsString.resultAsString)
                         }, checkEncrypt: true
                     })

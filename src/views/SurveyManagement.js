@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import ListAnswer from '../components/ListAnswer';
+import SimpleCrypto from "simple-crypto-js";
 import { Row, Col, Card, InputGroup, InputGroupText, InputGroupAddon, Input, Button, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Modal, ModalHeader, ModalBody } from 'reactstrap'
 
 export default class SurveyManagement extends Component {
@@ -11,6 +12,7 @@ export default class SurveyManagement extends Component {
         this.showListName = this.showListName.bind(this);
         this.showMemberGroup = this.showMemberGroup.bind(this);
         this.sendRequest = this.sendRequest.bind(this);
+        this.sendRequestDecrypt = this.sendRequestDecrypt.bind(this);
         this.cancel = this.cancel.bind(this);
 
 
@@ -32,7 +34,9 @@ export default class SurveyManagement extends Component {
             update: false,
             isOpen: false,
             modal1: false,
-            modal2: false
+            modal2: false,
+            checkType: false,
+            checkEncrypt: false
         };
     }
 
@@ -123,6 +127,14 @@ export default class SurveyManagement extends Component {
                     })
             })
         }*/
+        if (await this.state.survey.shareTo === "open" || this.state.survey.shareTo === "close") {
+            this.state.listAnswer.map(answer => {
+                if (answer.head !== "" && answer.decryptKey === "") {
+                    this.setState({ checkEncrypt: true })
+                }
+            })
+            this.setState({ checkType: true })
+        }
     }
     async componentDidUpdate(prevProps, prevState) {
         if (prevState.update !== this.state.update) {
@@ -374,7 +386,7 @@ export default class SurveyManagement extends Component {
         console.log(this.state.listAnswer);
         return (
             this.state.listAnswer.map(res => {
-                return <ListAnswer answer={res} />
+                return <ListAnswer answer={res} surveyType={this.state.survey.shareTo} surveyWantName={this.state.survey.wantName}/>
             })
         )
     }
@@ -412,6 +424,32 @@ export default class SurveyManagement extends Component {
             })
         }
 
+    }
+    sendRequestDecrypt(){
+        var userIds = [];
+        var check = true;
+        var secretKey = "SJyevrus"
+        var simpleCryptoSystem = new SimpleCrypto(secretKey);
+
+        this.state.listAnswer.map(answer => {
+            var userId = simpleCryptoSystem.decrypt(answer.userId);
+            userIds.map(sameUserId => {
+                if(userId === sameUserId) check = false;
+            })
+            if(check){
+                var request = {
+                    userId: userId,
+                    typeRequest: "decryption",
+                    data: this.props.surveyId
+                }
+                console.log(request);
+                axios.post('http://localhost:5000/requests/create', request)
+                    .then(res => console.log(res.data));
+                
+                userIds = userIds.concat(userId);
+                console.log(userIds);
+            }
+        })
     }
 
     cancel() {
@@ -508,7 +546,7 @@ export default class SurveyManagement extends Component {
                                 width: "600px",
                                 textAlign: "center"
                             }}>
-                                {this.state.survey.haveGroup ? <div style={{marginTop: "0.5rem"}}>{this.showMemberGroup()}</div> : <div style={{marginTop: "2rem"}}>ไม่ได้ตั้งค่าให้ใช้งานส่วนนี้ได้</div>}
+                                {this.state.survey.haveGroup ? <div style={{ marginTop: "0.5rem" }}>{this.showMemberGroup()}</div> : <div style={{ marginTop: "2rem" }}>ไม่ได้ตั้งค่าให้ใช้งานส่วนนี้ได้</div>}
                             </Card>
                         </div>
                     </Row>
@@ -523,13 +561,19 @@ export default class SurveyManagement extends Component {
                         <Col>
                             <p>มีจำนวนผู้ตอบอยู่ {this.state.amountUser} คน</p>
                         </Col>
+                        <Col>
+                            {this.state.checkType ? this.state.checkEncrypt ?
+                                <Button color="primary" onClick={this.sendRequestDecrypt}>ส่งคำขอดูคำตอบ</Button> :
+                                <Button color="primary"  disabled>ส่งคำขอดูคำตอบ</Button>
+                                : ""}
+                        </Col>
                     </Row>
                     <br></br>
-                    <Row style={{marginLeft: "1rem"}}>
+                    <Row style={{ marginLeft: "1rem" }}>
                         รายการคำตอบจากผู้เข้ามาทำแบบสอบถาม
                     </Row>
                     <br></br>
-                    <Row style={{marginLeft: "1rem"}}>
+                    <Row style={{ marginLeft: "1rem" }}>
                         {this.showAnswers()}
                     </Row>
                 </div>

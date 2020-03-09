@@ -5,6 +5,7 @@ import ListUpgradeRequest from '../components/ListUpgradeRequest';
 import ListMemberRequest from '../components/ListMemberRequest';
 import ListDoOnlyRequest from '../components/ListDoOnlyRequest';
 import ListFrequencyRequest from '../components/ListFrequencyRequest';
+import ListDecryptionRequest from '../components/ListDecryptionRequest';
 
 export default class Requests extends Component {
     constructor(props) {
@@ -38,22 +39,22 @@ export default class Requests extends Component {
                 console.log(error);
             })
 
-       /* await this.state.requests.map(requests => {
-            if (requests.typeRequest === "frequency") {
-                axios.get('http://localhost:5000/frequency/' + requests.data[1])
-                    .then(response => {
-                        freq = freq.concat(response.data);
-                        console.log(response.data);
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
-            }
-        })
-        await this.setState({
-            frequency: freq
-        })
-        console.log(this.state.frequency);*/
+        /* await this.state.requests.map(requests => {
+             if (requests.typeRequest === "frequency") {
+                 axios.get('http://localhost:5000/frequency/' + requests.data[1])
+                     .then(response => {
+                         freq = freq.concat(response.data);
+                         console.log(response.data);
+                     })
+                     .catch((error) => {
+                         console.log(error);
+                     })
+             }
+         })
+         await this.setState({
+             frequency: freq
+         })
+         console.log(this.state.frequency);*/
     }
 
     showRequests() {
@@ -67,21 +68,9 @@ export default class Requests extends Component {
                     } else if (res.typeRequest === "doOnly") {
                         return <ListDoOnlyRequest doOnlyRequest={res} />
                     } else if (res.typeRequest === "frequency") {
-                        /* if (this.state.frequency[0] !== undefined) {
-                             return (
-                                 this.state.frequency.map(f => {
-                                     return (
-                                         f.listTimeToDo.map(time => {
-                                            if(time.day === this.state.nowDate && time.month === this.state.nowMonth && time.year === this.state.nowYear){
-                                                return <ListFrequencyRequest frequencyRequest={res} />
-                                            }
-                                        })
-                                     )
-                                 })
-                             )
-                         }*/
-
                         return <ListFrequencyRequest frequencyRequest={res} />
+                    } else if(res.typeRequest === "decryption") {
+                        return <ListDecryptionRequest decryptionRequest={res} />
                     }
                 })
             )

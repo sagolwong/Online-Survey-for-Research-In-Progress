@@ -133,10 +133,9 @@ export default class FollowResult extends Component {
             })
         )
     }
-
-    render() {
+    showTable() {
         return (
-            <div >
+            <div>
                 <h1>ติดตามผล</h1>
                 <Table bordered>
                     <thead>
@@ -149,6 +148,14 @@ export default class FollowResult extends Component {
                         {this.state.checkListTime ? this.showRow() : ""}
                     </tbody>
                 </Table>
+            </div>
+        )
+    }
+
+    render() {
+        return (
+            <div >
+                {this.state.frequency[0] !== undefined ? this.showTable() : <p>ไม่ได้ตั้งค่าให้สามารถใช้งานฟังก์ชันนี้ได้</p>}
             </div>
         )
     }
