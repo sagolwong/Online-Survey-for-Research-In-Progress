@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import SimpleCrypto from "simple-crypto-js";
-import { Button, Card, Row, CardTitle, Modal, ModalHeader, ModalBody } from 'reactstrap'
+import { Button, Card, Row, CardTitle, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 export default class ListAnswer extends Component {
     constructor(props) {
@@ -9,31 +9,79 @@ export default class ListAnswer extends Component {
 
         this.state = {
             checkDecrypt: false,
+            checkName: false,
             keys: [],
             values: [],
-            modal: false
+            user: {},
+            modal1: false,
+            modal2: false
+
         }
         this.showAnswer = this.showAnswer.bind(this);
-        this.toggleModal = this.toggleModal.bind(this);
+        this.showName = this.showName.bind(this);
+        this.showDetail = this.showDetail.bind(this);
+        this.toggleModal1 = this.toggleModal1.bind(this);
+        this.toggleModal2 = this.toggleModal2.bind(this);
 
     }
     componentDidMount() {
         const surveyType = this.props.surveyType;
         const surveyWantName = this.props.surveyWantName;
+        var secretKey = "SJyevrus";
+        var simpleCryptoSystem = new SimpleCrypto(secretKey);
         console.log(surveyType)
 
-        if ((surveyType === "open" || surveyType === "close") && surveyWantName) {
-            if (this.props.answer.head !== "" && this.props.answer.decryptKey !== "") {
-                this.setState({ checkDecrypt: true })
+        if (surveyType === "open" || surveyType === "close") {
+            if (surveyWantName) {
+                if (this.props.answer.head !== "" && this.props.answer.decryptKey !== "") {
+                    this.setState({ checkDecrypt: true, checkName: true })
+                    var userId = simpleCryptoSystem.decrypt(this.props.answer.userId);
+                    axios.get(`http://localhost:5000/users/` + userId)
+                        .then(response => {
+                            this.setState({
+                                user: response.data
+                            })
+
+                            console.log(this.state.user);
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        })
+                } else if (this.props.answer.head === "") {
+                    this.setState({ checkDecrypt: true, checkName: true })
+                    var userId = this.props.answer.userId;
+                    axios.get(`http://localhost:5000/users/` + userId)
+                        .then(response => {
+                            this.setState({
+                                user: response.data
+                            })
+
+                            console.log(this.state.user);
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        })
+                }
+            } else {
+                if (this.props.answer.head === "") {
+                    this.setState({ checkDecrypt: true })
+                }
             }
+
         } else if (surveyType === "public") {
             this.setState({ checkDecrypt: true })
+            if (surveyWantName) this.setState({ checkName: true })
         }
 
     }
-    toggleModal() {
+    toggleModal1() {
         this.setState({
-            modal: !this.state.modal
+            modal1: !this.state.modal1
+        });
+    }
+    toggleModal2() {
+        this.setState({
+            modal2: !this.state.modal2
         });
     }
 
@@ -50,17 +98,32 @@ export default class ListAnswer extends Component {
         this.setState({
             keys: Object.keys(answer),
             values: Object.values(answer),
-            modal: true
+            modal1: true
         })
     }
-    showDetail(){
+    showDetail() {
         return (
-            this.state.keys.map((key,index)=>{
+            this.state.keys.map((key, index) => {
                 return (
-                <p>{key} : {this.state.values[index].toString()}</p>
+                    <p>{key} : {this.state.values[index].toString()}</p>
                 )
             })
         )
+    }
+    showName() {
+        const surveyType = this.props.surveyType;
+        if ((surveyType === "open" || surveyType === "close") && this.state.checkName) {
+            return <p>ผู้ตอบแบบสอบถาม : {this.state.user.firstname} {this.state.user.lastname}</p>
+        } else if (surveyType === "public" && this.state.checkName) {
+            return <p>ผู้ตอบแบบสอบถาม : {this.props.answer.name}</p>
+        }
+    }
+
+    confirm(){
+        if(this.props.delete){
+            const index = this.props.index;
+            this.props.delete(index)
+        }
     }
 
     render() {
@@ -78,15 +141,25 @@ export default class ListAnswer extends Component {
                     {this.state.checkDecrypt ?
                         <Button outline color="primary" style={{ marginRight: "0.5rem" }} onClick={this.showAnswer} >ดูคำตอบ</Button> :
                         ""}
-                    <Button outline color="danger" >ลบคำตอบ</Button>
+                    <Button outline color="danger" onClick={this.toggleModal2}>ลบคำตอบ</Button>
                 </Row>
-                <Modal isOpen={this.state.modal} toggle={this.toggleModal}
+                <Modal isOpen={this.state.modal1} toggle={this.toggleModal1}
                     fade={true}
                     className={this.props.className}>
-                    <ModalHeader toggle={this.toggleModal}>คำตอบของผู้ตอบแบบสอบถาม</ModalHeader>
+                    <ModalHeader toggle={this.toggleModal1}>คำตอบของผู้ตอบแบบสอบถาม</ModalHeader>
                     <ModalBody>
+                        {this.showName()}
                         {this.showDetail()}
                     </ModalBody>
+                </Modal>
+                <Modal isOpen={this.state.modal2} toggle={this.toggleModal2}
+                    fade={true}
+                    className={this.props.className}>
+                    <ModalHeader toggle={this.toggleModal2}>คุณต้องการลบคำตอบนี้จริงหรือไม่ ?</ModalHeader>
+                    <ModalFooter>
+                        <Button color="primary" onClick={this.confirm.bind(this)}>ใช่</Button> 
+                        <Button color="danger" onClick={this.toggleModal2}>ไม่ใช่</Button>
+                    </ModalFooter>
                 </Modal>
             </div>
         )

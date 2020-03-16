@@ -13,6 +13,7 @@ export default class SurveyManagement extends Component {
         this.showMemberGroup = this.showMemberGroup.bind(this);
         this.sendRequest = this.sendRequest.bind(this);
         this.sendRequestDecrypt = this.sendRequestDecrypt.bind(this);
+        this.deleteAnswer = this.deleteAnswer.bind(this);
         this.cancel = this.cancel.bind(this);
 
 
@@ -32,6 +33,7 @@ export default class SurveyManagement extends Component {
             answer: [],
             listAnswer: [],
             update: false,
+            deleteAnswer: false,
             isOpen: false,
             modal1: false,
             modal2: false,
@@ -188,6 +190,23 @@ export default class SurveyManagement extends Component {
                 })
             }
         }
+        if (prevState.deleteAnswer !== this.state.deleteAnswer) {
+            axios.get(`http://localhost:5000/answers/find/` + this.props.surveyId)
+                .then(response => {
+                    this.setState({
+                        answer: response.data,
+                        listAnswer: response.data[0].answerUsers,
+                        amountAnswer: response.data[0].amountAnswer,
+                        amountUser: response.data[0].amountUser
+                    })
+                    console.log(this.state.answer);
+                    console.log(this.state.answer[0].answerUsers);
+                    console.log(this.state.listAnswer);
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+        }
     }
 
     updateSearch(e) {
@@ -284,53 +303,53 @@ export default class SurveyManagement extends Component {
         this.addToControlsGroup(index)
     }}>เพิ่มเข้ากลุ่มควบคุม</Button>}*/
 
-    checkExperimentsGroup(index) {
-        if (this.state.survey.listNameExperiments[0] !== undefined) {
-            return (
-                this.state.survey.listNameExperiments.map(userId => {
-                    if (userId === this.state.members[index]._id) return true;
-                })
-            )
-        }
+    /* checkExperimentsGroup(index) {
+         if (this.state.survey.listNameExperiments[0] !== undefined) {
+             return (
+                 this.state.survey.listNameExperiments.map(userId => {
+                     if (userId === this.state.members[index]._id) return true;
+                 })
+             )
+         }
+ 
+     }
+ 
+     checkControlsGroup(index) {
+         if (this.state.survey.listNameControls[0] !== undefined) {
+             return (
+                 this.state.survey.listNameControls.map(userId => {
+                     if (userId === this.state.members[index]._id) return true;
+                 })
+             )
+         }
+ 
+     }*/
 
-    }
-
-    checkControlsGroup(index) {
-        if (this.state.survey.listNameControls[0] !== undefined) {
-            return (
-                this.state.survey.listNameControls.map(userId => {
-                    if (userId === this.state.members[index]._id) return true;
-                })
-            )
-        }
-
-    }
-
-    async addToExperimentsGroup(index) {
-        var ExperimentsGroup = {
-            listNameExperiments: this.state.survey.listNameExperiments.concat(this.state.members[index]._id)
-        }
-        console.log(ExperimentsGroup);
-        await axios.post(`http://localhost:5000/surveys/experiments/${this.props.surveyId}`, ExperimentsGroup)
-            .then(res => console.log(res.data));
-
-        await this.setState({
-            update: !this.state.update
-        })
-    }
-
-    async addToControlsGroup(index) {
-        var ControlsGroup = {
-            listNameControls: this.state.survey.listNameControls.concat(this.state.members[index]._id)
-        }
-        console.log(ControlsGroup);
-        await axios.post(`http://localhost:5000/surveys/controls/${this.props.surveyId}`, ControlsGroup)
-            .then(res => console.log(res.data));
-
-        await this.setState({
-            update: !this.state.update
-        })
-    }
+    /* async addToExperimentsGroup(index) {
+         var ExperimentsGroup = {
+             listNameExperiments: this.state.survey.listNameExperiments.concat(this.state.members[index]._id)
+         }
+         console.log(ExperimentsGroup);
+         await axios.post(`http://localhost:5000/surveys/experiments/${this.props.surveyId}`, ExperimentsGroup)
+             .then(res => console.log(res.data));
+ 
+         await this.setState({
+             update: !this.state.update
+         })
+     }
+ 
+     async addToControlsGroup(index) {
+         var ControlsGroup = {
+             listNameControls: this.state.survey.listNameControls.concat(this.state.members[index]._id)
+         }
+         console.log(ControlsGroup);
+         await axios.post(`http://localhost:5000/surveys/controls/${this.props.surveyId}`, ControlsGroup)
+             .then(res => console.log(res.data));
+ 
+         await this.setState({
+             update: !this.state.update
+         })
+     }*/
 
     async deleteMember(index1) {
         await this.state.names.map((userId, index2) => {
@@ -356,7 +375,7 @@ export default class SurveyManagement extends Component {
 
     }
 
-    showListExperiments() {
+    /*showListExperiments() {
         return (
             this.state.listNameExperiments.map((user, index) => {
                 return (
@@ -380,16 +399,51 @@ export default class SurveyManagement extends Component {
                 )
             })
         )
-    }
+    }*/
 
     showAnswers() {
         console.log(this.state.listAnswer);
         return (
-            this.state.listAnswer.map(res => {
-                return <ListAnswer answer={res} surveyType={this.state.survey.shareTo} surveyWantName={this.state.survey.wantName}/>
+            this.state.listAnswer.map((res, index) => {
+                return <ListAnswer answer={res} surveyType={this.state.survey.shareTo} surveyWantName={this.state.survey.wantName} index={index} delete={this.deleteAnswer} />
             })
         )
     }
+
+    async deleteAnswer(index1) {
+        console.log(this.state.listAnswer)
+        await this.state.listAnswer.map((answer, index2) => {
+            if (index1 === index2) {
+                this.setState(({ listAnswer }) => {
+                    const mlistAnswers = [...listAnswer]
+                    mlistAnswers.splice(index2, 1)
+                    return { listAnswer: mlistAnswers }
+                })
+            }
+        })
+        if (await this.state.amountAnswer === this.state.amountUser) {
+            this.setState({
+                amountAnswer: this.state.amountAnswer - 1,
+                amountUser: this.state.amountUser - 1
+            })
+        } else {
+            this.setState({ amountAnswer: this.state.amountAnswer - 1 })
+        }
+        var answers = {
+            amountUser: this.state.amountUser,
+            amountAnswer: this.state.amountAnswer,
+            answerUsers: this.state.listAnswer
+        }
+        console.log(answers);
+        await axios.post(`http://localhost:5000/answers/deleteAnswer/${this.state.answer[0]._id}`, answers)
+            .then(res => console.log(res.data));
+
+        this.setState({
+            deleteAnswer: !this.state.deleteAnswer
+        })
+    }
+
+
 
     sendRequest() {
         if (this.state.survey.haveGroup) {
@@ -425,7 +479,7 @@ export default class SurveyManagement extends Component {
         }
 
     }
-    sendRequestDecrypt(){
+    sendRequestDecrypt() {
         var userIds = [];
         var check = true;
         var secretKey = "SJyevrus"
@@ -434,9 +488,9 @@ export default class SurveyManagement extends Component {
         this.state.listAnswer.map(answer => {
             var userId = simpleCryptoSystem.decrypt(answer.userId);
             userIds.map(sameUserId => {
-                if(userId === sameUserId) check = false;
+                if (userId === sameUserId) check = false;
             })
-            if(check){
+            if (check) {
                 var request = {
                     userId: userId,
                     typeRequest: "decryption",
@@ -445,7 +499,7 @@ export default class SurveyManagement extends Component {
                 console.log(request);
                 axios.post('http://localhost:5000/requests/create', request)
                     .then(res => console.log(res.data));
-                
+
                 userIds = userIds.concat(userId);
                 console.log(userIds);
             }
@@ -502,7 +556,7 @@ export default class SurveyManagement extends Component {
                                 {this.state.survey.haveGroup ?
                                     <div>
                                         <DropdownItem onClick={this.toggleModal1.bind(this)}>สำหรับเชิญทำแบบสอบถาม</DropdownItem>
-                                        <DropdownItem onClick={this.toggleModal2.bind(this)}>สำหรับเชิญเป็นสมาชิกทำแบบสอบถาม</DropdownItem>
+                                        <DropdownItem onClick={this.toggleModal2.bind(this)}>สำหรับเชิญเข้าร่วมกลุ่มทำแบบสอบถาม</DropdownItem>
                                     </div> :
                                     <div>
                                         <DropdownItem onClick={this.toggleModal1.bind(this)}>สำหรับเชิญทำแบบสอบถาม</DropdownItem>
@@ -520,7 +574,7 @@ export default class SurveyManagement extends Component {
                 </Modal>
                 <Modal isOpen={this.state.modal2} toggle={this.toggleModal2.bind(this)}
                     fade={true} backdrop="static" className={this.props.className}>
-                    <ModalHeader toggle={this.toggleModal2.bind(this)}>ลิงค์สำหรับเชิญเป็นสมาชิกทำแบบสอบถาม</ModalHeader>
+                    <ModalHeader toggle={this.toggleModal2.bind(this)}>สำหรับเชิญเข้าร่วมกลุ่มทำแบบสอบถาม</ModalHeader>
                     <ModalBody>
                         <Input type="text" rows={5} value={"http://localhost:3000/invite-to-group/" + this.props.surveyId} disabled />
                     </ModalBody>
@@ -538,7 +592,7 @@ export default class SurveyManagement extends Component {
                 </Row>
                 <br></br>
                 <Col>
-                    <div><p>รายชื่อสมาชิกทำแบบสอบถาม</p></div>
+                    <div><p>รายชื่อผู้เข้าร่วมกลุ่มทำแบบสอบถาม</p></div>
                     <Row>
                         <div>
                             <Card style={{
@@ -564,7 +618,7 @@ export default class SurveyManagement extends Component {
                         <Col>
                             {this.state.checkType ? this.state.checkEncrypt ?
                                 <Button color="primary" onClick={this.sendRequestDecrypt}>ส่งคำขอดูคำตอบ</Button> :
-                                <Button color="primary"  disabled>ส่งคำขอดูคำตอบ</Button>
+                                <Button color="primary" disabled>ส่งคำขอดูคำตอบ</Button>
                                 : ""}
                         </Col>
                     </Row>

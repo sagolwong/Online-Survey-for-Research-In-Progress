@@ -4,6 +4,7 @@ import axios from 'axios';
 import CreateSurvey1 from '../views/CreateSurvey1';
 import CreateSurvey2 from '../views/CreateSurvey2';
 import CreateSurvey3 from '../views/CreateSurvey3';
+import ReviewSurvey from '../views/ReviewSurvey';
 
 class baseCreateSurvey extends Component {
     constructor(props) {
@@ -67,6 +68,8 @@ class baseCreateSurvey extends Component {
         } else if (this.props.test.step === 3) {
             return <CreateSurvey3 />
         } else if (this.props.test.step === 4) {
+            return <ReviewSurvey />
+        } else if (this.props.test.step === 5) {
             const data = {
                 projectId: this.props.test.projectId,
                 sampleGroupId: this.props.test.sampleGroupId,
@@ -76,14 +79,13 @@ class baseCreateSurvey extends Component {
                 wantName: this.props.test.wantName,
                 haveGroup: this.props.test.haveGroup,
                 names: this.props.test.names,
-                listNameExperiments: this.props.test.listNameExperiments,
-                listNameControls: this.props.test.listNameControls,
                 frequency: this.props.test.frequency,
                 doOnce: this.props.test.doOnce,
                 openAndCloseTimes: this.props.test.openAndCloseTimes,
                 qprocess: this.props.test.qprocess,
                 builtIns: this.props.test.builtIns,
-                data: this.props.test.data
+                data: this.props.test.data,
+                status: this.props.test.status
             }
             console.log(data);
             axios.post(`http://localhost:5000/surveys/create`, data)
@@ -91,17 +93,21 @@ class baseCreateSurvey extends Component {
                     console.log(res.data)
                     axios.get(`http://localhost:5000/surveys/${this.state.project._id}/` + data.nameSurvey)
                         .then(response => {
-                            if (this.props.test.dateToDo !== undefined) {
-                                const frequency = {
-                                    surveyId: response.data[0]._id,
-                                    listTimeToDo: this.props.test.dateToDo
+                            console.log(response.data[0]._id);
+                            if (this.props.test.status === "publish") {
+                                if (this.props.test.dateToDo !== undefined) {
+                                    const frequency = {
+                                        surveyId: response.data[0]._id,
+                                        listTimeToDo: this.props.test.dateToDo
+                                    }
+                                    axios.post(`http://localhost:5000/frequency/create`, frequency)
+                                        .then(res => console.log(res.data))
                                 }
-                                axios.post(`http://localhost:5000/frequency/create`, frequency)
-                                    .then(res => console.log(res.data))
+                                window.location = '/survey-management/' + response.data[0]._id;
+                            } else if (this.props.test.status === "draft") {
+                                window.location = '/';
                             }
 
-                            console.log(response.data[0]._id);
-                            window.location = '/survey-management/' + response.data[0]._id;
                         })
                         .catch((error) => {
                             console.log(error);

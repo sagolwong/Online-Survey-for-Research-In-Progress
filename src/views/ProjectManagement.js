@@ -108,8 +108,22 @@ export default class ProjectManagement extends Component {
     showGroupSurvey() {
         return (
             this.state.surveys.map(res => {
-                if (res.sampleGroupId === undefined) {
-                    return <ListSurvey survey={res} />
+                if (res.sampleGroupId === "") {
+                    if (res.status === "publish") {
+                        return <ul><ListSurvey survey={res} /></ul>
+                    }
+                }
+            })
+        )
+    }
+
+    showGroupDraft() {
+        return (
+            this.state.surveys.map(res => {
+                if (res.sampleGroupId === "") {
+                    if (res.status === "draft") {
+                        return <ul><ListSurvey survey={res} /></ul>
+                    }
                 }
             })
         )
@@ -171,7 +185,9 @@ export default class ProjectManagement extends Component {
                 </Modal>
                 <div>
                     <Card>
-                        <p align="center">---------------------- กลุ่มแบบสอบถาม ----------------------</p>
+                        <p align="center">---------------------- แบบร่าง ----------------------</p>
+                        {this.showGroupDraft()}
+                        <p align="center">---------------------- แบบสอบถาม ----------------------</p>
                         {this.showGroupSurvey()}
                         <p align="center">------------------------ กลุ่มตัวอย่าง ------------------------</p>
                         {this.showGroupSampleGroup()}

@@ -123,7 +123,7 @@ export default class FollowResult extends Component {
         return (
             this.state.listTimeToDo.map(dates => {
                 var check = false;
-                this.state.follower[index].follow.map(date => {
+                this.state.follower[index].follow.map((date, i) => {
                     if (dates === date) {
                         check = true;
                     }

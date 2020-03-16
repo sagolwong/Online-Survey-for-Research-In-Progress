@@ -39,6 +39,11 @@ router.route('/find/:id').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/findSG/:projectId/:name').get((req, res) => {
+    SampleGroup.find({ projectId: req.params.projectId,nameSampleGroup: req.params.name })
+        .then(sampleGroup => res.json(sampleGroup))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
 router.route('/edit/:id').post((req, res) => {
     SampleGroup.findById(req.params.id)
         .then(sampleGroup => {

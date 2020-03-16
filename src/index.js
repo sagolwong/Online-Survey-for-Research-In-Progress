@@ -8,10 +8,10 @@ import App from './App';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
-import infoSurveyReducer from './reducer/infoSurveyReducer';
+import surveyReducer from './reducer/surveyReducer';
 
 //สร้างคลังข้อมูล
-const store = createStore(infoSurveyReducer);
+const store = createStore(surveyReducer);
 
 ReactDOM.render(
     <Provider store = {store}>

@@ -18,6 +18,8 @@ import { connect } from 'react-redux';
 import baseManageSurvey from './components/baseManageSurvey';
 import CheckBeforeDo from './views/CheckBeforeDo';
 import InviteToGroup from './views/InviteToGroup';
+import Prototype from './views/Prototype';
+import baseEditSurvey from './components/baseEditSurvey';
 
 
 class App extends Component {
@@ -75,6 +77,7 @@ class App extends Component {
       <Switch>
         <Route exact path="/" component={Requests} />
         <Route exact path="/surveys" component={Surveys} />
+        <Route exact path="/prototypes" component={Prototype} />
         <Route exact path="/projects" component={Projects} />
         <Route exact path="/contacts" component={Contacts} />
         <Route exact path="/user-profile" component={UserProfile} />
@@ -83,6 +86,7 @@ class App extends Component {
         <Route exact path="/project-management/sample-group-management/:projectId/:sampleGroupId" component={SampleGroupManagement} />
         <Route exact path="/create-survey/:projectId" component={baseCreateSurvey} />
         <Route exact path="/create-survey/:projectId/:sampleGroupId" component={baseCreateSurvey} />
+        <Route exact path="/edit-survey/:type/:id" component={baseEditSurvey} />
         <Route exact path="/online-survey/:surveyId" component={OnlineSurvey} />
         <Route exact path="/online-survey/:surveyId/name=:name" component={OnlineSurvey} />
         <Route exact path="/online-survey-check/:surveyId" component={CheckBeforeDo} />

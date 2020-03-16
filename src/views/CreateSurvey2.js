@@ -24,6 +24,16 @@ class CreateSurvey2 extends Component {
             builtInWidgetIncome: false,
         };
     }
+    componentDidMount(){
+        this.props.test.builtIns.map(widget => {
+            if (widget.builtInWidget === "gender") this.setState({ builtInWidgetGender: true })
+            else if (widget.builtInWidget === "ages") this.setState({ builtInWidgetAges: true })
+            else if (widget.builtInWidget === "status") this.setState({ builtInWidgetStatus: true })
+            else if (widget.builtInWidget === "education") this.setState({ builtInWidgetEducation: true })
+            else if (widget.builtInWidget === "job") this.setState({ builtInWidgetJob: true })
+            else if (widget.builtInWidget === "income") this.setState({ builtInWidgetIncome: true })
+        })
+    }
 
     onChangeBuiltInWidgetGender(e) {
         this.setState({
@@ -59,42 +69,42 @@ class CreateSurvey2 extends Component {
     render() {
         return (
             <div className="editor">
-                <h4>Built-In</h4>
+                <h4>คำถามพื้นฐานสำเร็จรูป</h4>
                 <p>โปรดเลือกคำถามเกี่ยวกับข้อมูลส่วนตัวจากที่นี่</p>
                 <FormGroup check>
                     <div>
                         <Label check>
-                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetGender} />{''}
+                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetGender} checked={this.state.builtInWidgetGender}/>{''}
                             คำถามเรื่องเพศ
                         </Label>
                     </div>
                     <div>
                         <Label check>
-                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetAges} />{''}
+                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetAges} checked={this.state.builtInWidgetAges}/>{''}
                             คำถามเรื่องอายุ
                         </Label>
                     </div>
                     <div>
                         <Label check>
-                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetStatus} />{''}
+                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetStatus} checked={this.state.builtInWidgetStatus}/>{''}
                             คำถามเรื่องสถานภาพ
                         </Label>
                     </div>
                     <div>
                         <Label check>
-                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetEducation} />{''}
+                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetEducation} checked={this.state.builtInWidgetEducation}/>{''}
                             คำถามเรื่องระดับการศึกษา
                         </Label>
                     </div>
                     <div>
                         <Label check>
-                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetJob} />{''}
+                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetJob} checked={this.state.builtInWidgetJob}/>{''}
                             คำถามเรื่องอาชีพ
                         </Label>
                     </div>
                     <div>
                         <Label check>
-                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetIncome} />{''}
+                            <Input type="checkbox" onChange={this.onChangeBuiltInWidgetIncome} checked={this.state.builtInWidgetIncome}/>{''}
                             คำถามเรื่องรายได้เฉลี่ยต่อเดือน
                         </Label>
                     </div>

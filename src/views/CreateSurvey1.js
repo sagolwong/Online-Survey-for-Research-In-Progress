@@ -39,6 +39,16 @@ class CreateSurvey1 extends Component {
                 shareTo: this.props.test.shareTo
             })
         }
+        if (this.props.test.wantName !== "") {
+            this.setState({
+                wantName: this.props.test.wantName
+            })
+        }
+        if (this.props.test.haveGroup !== "") {
+            this.setState({
+                haveGroup: this.props.test.haveGroup
+            })
+        }
 
     }
 
@@ -85,6 +95,21 @@ class CreateSurvey1 extends Component {
         });
         //window.location = '/create-project/project-management/create-survey2';
     }
+    saveDraft() {
+        const data = {
+            surveyName: this.state.surveyName,
+            description: this.state.description,
+            shareTo: this.state.shareTo,
+            wantName: this.state.wantName,
+            haveGroup: this.state.haveGroup,
+            status: "draft"
+        }
+        //console.log(data);
+        this.props.dispatch({
+            type: 'ADD_DRAFT_STEP1',
+            data
+        });
+    }
 
     render() {
         /*let filterUser = this.state.listUser.filter(user => {
@@ -113,22 +138,22 @@ class CreateSurvey1 extends Component {
                     </FormGroup>
                     <FormGroup check>
                         <Label check>
-                            <Input type="checkbox" onChange={this.onChangeWantName} />{''}
+                            <Input type="checkbox" onChange={this.onChangeWantName} checked={this.state.wantName}/>{''}
                             ต้องการทราบชื่อผู้ทำแบบสอบถาม
                         </Label>
                     </FormGroup>
                     {this.state.shareTo !== "public" && this.state.shareTo !== "" ?
                         <FormGroup check>
                             <Label check>
-                                <Input type="checkbox" onChange={this.onChangeHaveGroup} />{''}
+                                <Input type="checkbox" onChange={this.onChangeHaveGroup} checked={this.state.haveGroup}/>{''}
                                 ต้องการให้มีสมาชิกสำหรับทำแบบสอบถาม
                         </Label>
                         </FormGroup> : ""}
-                        <br></br>
+                    <br></br>
+                    <Button color="primary" onClick={this.saveDraft.bind(this)}>บันทึกแบบร่าง</Button>&nbsp;
                     <Button color="info">ต่อไป</Button>
-                    <Button color="warning">บันทึกแบบร่าง</Button>
                 </Form>
-                
+
                 {console.log(this.props.test)}
             </div>
         )

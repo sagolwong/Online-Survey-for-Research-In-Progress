@@ -36,6 +36,7 @@ class CreateSurvey3 extends Component {
             dateToDo: [],
             setFreq: false,
             doOnce: false,
+            doMany: false,
             schedule: false,
             startDate: date,
             startMonth: month,
@@ -52,16 +53,44 @@ class CreateSurvey3 extends Component {
         };
     }
 
-    /*onChangeFrq1(e) {
-        this.setState({
-            frequency: {
-                amount: 1,
-                unitsOfTime: "day"
-            },
-            setFreq: false,
-            schedule: false
-        })
-    }*/
+    componentDidMount() {
+        if (this.props.test.comeFrom === "4-3") {
+            this.setState({
+                schedule: true,
+                startDate: this.props.test.openAndCloseTimes.start.day,
+                startMonth: this.props.test.openAndCloseTimes.start.month,
+                startYear: this.props.test.openAndCloseTimes.start.year,
+                endDate: this.props.test.openAndCloseTimes.end.day,
+                endMonth: this.props.test.openAndCloseTimes.end.month,
+                endYear: this.props.test.openAndCloseTimes.end.year,
+            })
+
+            if (this.props.test.doOnce) {
+                this.setState({
+                    doOnce: true,
+                    setFreq: false
+                })
+            } else {
+                if (this.props.test.frequency.amount !== 0) {
+                    this.setState({
+                        doOnce: false,
+                        setFreq: true,
+                        frequency: {
+                            amount: this.props.test.frequency.amount,
+                            unitsOfTime: this.props.test.frequency.unitsOfTime
+                        }
+                    })
+                } else {
+                    this.setState({
+                        doOnce: false,
+                        setFreq: false,
+                        doMany: true
+                    })
+                }
+            }
+        }
+
+    }
     onChangeAmount(e) {
         this.setState({
             frequency: {
@@ -82,22 +111,57 @@ class CreateSurvey3 extends Component {
         this.setState({
             setFreq: !this.state.setFreq,
             schedule: !this.state.schedule,
-            doOnce: false
+            doOnce: false,
+            doMany: false
         })
     }
     onChangeDoOnce() {
-        this.setState({
-            doOnce: true,
-            setFreq: false,
-            schedule: false
-        })
+        if (this.state.setFreq) {
+            this.setState({
+                doOnce: true,
+                setFreq: false,
+                schedule: false,
+                doMany: false,
+                frequency: {
+                    amount: 0,
+                    unitsOfTime: ""
+                }
+            })
+        } else {
+            this.setState({
+                doOnce: true,
+                setFreq: false,
+                doMany: false,
+                frequency: {
+                    amount: 0,
+                    unitsOfTime: ""
+                }
+            })
+        }
     }
     onChangeDoMany() {
-        this.setState({
-            doOnce: false,
-            setFreq: false,
-            schedule: false
-        })
+        if (this.state.setFreq) {
+            this.setState({
+                doOnce: false,
+                setFreq: false,
+                schedule: false,
+                doMany: true,
+                frequency: {
+                    amount: 0,
+                    unitsOfTime: ""
+                }
+            })
+        } else {
+            this.setState({
+                doOnce: false,
+                setFreq: false,
+                doMany: true,
+                frequency: {
+                    amount: 0,
+                    unitsOfTime: ""
+                }
+            })
+        }
     }
     onChangeSchedule() {
         if (this.state.schedule) {
@@ -370,18 +434,18 @@ class CreateSurvey3 extends Component {
                 console.log("numF=" + numF);
                 console.log("day=" + nDay);
             }
-        }else {
+        } else {
             const openAndCloseTimes = {
                 start,
                 end
             }
-            
+
             const data = {
                 frequency: this.state.frequency,
                 doOnce: this.state.doOnce,
                 openAndCloseTimes: openAndCloseTimes
             }
-    
+
             this.props.dispatch({
                 type: 'ADD_STEP3',
                 data
@@ -436,6 +500,40 @@ class CreateSurvey3 extends Component {
         });
         console.log(data);
     }
+    saveDraft() {
+        console.log(this.state.dateToDo);
+
+        const start = {
+            day: Number(this.state.startDate),
+            month: Number(this.state.startMonth),
+            year: Number(this.state.startYear)
+        }
+        const end = {
+            day: Number(this.state.endDate),
+            month: Number(this.state.endMonth),
+            year: Number(this.state.endYear)
+        }
+        console.log(start);
+        console.log(end);
+        const openAndCloseTimes = {
+            start,
+            end
+        }
+
+        const data = {
+            frequency: this.state.frequency,
+            doOnce: this.state.doOnce,
+            openAndCloseTimes: openAndCloseTimes,
+            dateToDo: this.state.dateToDo,
+            status: "draft"
+        }
+
+        this.props.dispatch({
+            type: 'ADD_DRAFT_STEP3',
+            data
+        });
+        console.log(data);
+    }
 
     render() {
         return (
@@ -446,7 +544,7 @@ class CreateSurvey3 extends Component {
                         <Col>
                             <FormGroup check>
                                 <Label check>
-                                    <Input type="radio" name="radio1" onChange={this.onChangeDoOnce} />{''}
+                                    <Input type="radio" name="radio1" onChange={this.onChangeDoOnce} checked={this.state.doOnce} />{''}
                                     1 ครั้ง
                                 </Label>
                             </FormGroup>
@@ -454,7 +552,7 @@ class CreateSurvey3 extends Component {
                         <Col>
                             <FormGroup check>
                                 <Label check>
-                                    <Input type="radio" name="radio1" onChange={this.onChangeDoMany} />{''}
+                                    <Input type="radio" name="radio1" onChange={this.onChangeDoMany} checked={this.state.doMany} />{''}
                                     มากกว่า 1 ครั้ง
                                 </Label>
                             </FormGroup>
@@ -463,7 +561,7 @@ class CreateSurvey3 extends Component {
                             {this.props.test.haveGroup === true ?
                                 <FormGroup check>
                                     <Label check>
-                                        <Input type="radio" name="radio1" onChange={this.onChangeSetFreq} />{''}
+                                        <Input type="radio" name="radio1" onChange={this.onChangeSetFreq} checked={this.state.setFreq} />{''}
                                         กำหนดเอง
                                 </Label>
                                 </FormGroup> : <FormGroup check disabled>
@@ -478,9 +576,9 @@ class CreateSurvey3 extends Component {
                     {this.state.setFreq === true ?
                         <FormGroup row>
                             <Col><Label>ทำแบบสอบถามทุกๆ</Label></Col>
-                            <Col sm={5}><Input type="text" placeholder="จำนวนครั้งต่อหน่วยเวลา" onChange={this.onChangeAmount} /></Col>
+                            <Col sm={5}><Input type="text" placeholder="จำนวนครั้งต่อหน่วยเวลา" value={this.state.frequency.amount !== 0 ?this.state.frequency.amount:""} onChange={this.onChangeAmount} /></Col>
                             <Col sm={3}>
-                                <Input type="select" onChange={this.onChangeUnitTime}>
+                                <Input type="select" value={this.state.frequency.unitsOfTime} onChange={this.onChangeUnitTime}>
                                     <option >หน่วยเวลา?</option>
                                     <option value="day">วัน</option>
                                     <option value="week">สัปดาห์</option>
@@ -500,7 +598,7 @@ class CreateSurvey3 extends Component {
                         </FormGroup> :
                         <FormGroup check>
                             <Label check>
-                                <Input type="checkbox" onChange={this.onChangeSchedule} />{''}
+                                <Input type="checkbox" onChange={this.onChangeSchedule} checked={this.state.schedule} />{''}
                                 กำหนดระยะเวลาเปิดปิดอัตโนมัติ
                         </Label>
                         </FormGroup>}
@@ -510,10 +608,10 @@ class CreateSurvey3 extends Component {
                             <FormGroup row>
                                 <Col><Label for="descript">เริ่มต้น:</Label></Col>
                                 <Col sm={3}>
-                                    <Input type="text" placeholder="วันที่" onChange={this.onChangeStartDate} />
+                                    <Input type="text" placeholder="วันที่" value={this.state.startDate} onChange={this.onChangeStartDate} />
                                 </Col>
                                 <Col sm={3}>
-                                    <Input type="select" onChange={this.onChangeStartMonth}>
+                                    <Input type="select" value={this.state.startMonth} onChange={this.onChangeStartMonth}>
                                         <option >เดือน?</option>
                                         <option value="1">มกราคม</option>
                                         <option value="2">กุมภาพันธ์</option>
@@ -530,16 +628,16 @@ class CreateSurvey3 extends Component {
                                     </Input>
                                 </Col>
                                 <Col sm={3}>
-                                    <Input type="text" placeholder="พ.ศ." onChange={this.onChangeStartYear} />
+                                    <Input type="text" placeholder="พ.ศ." value={this.state.startYear} onChange={this.onChangeStartYear} />
                                 </Col>
                             </FormGroup>
                             <FormGroup row>
                                 <Col><Label for="descript">สิ้นสุด:</Label></Col>
                                 <Col sm={3}>
-                                    <Input type="text" placeholder="วันที่" onChange={this.onChangeEndDate} />
+                                    <Input type="text" placeholder="วันที่" value={this.state.endDate} onChange={this.onChangeEndDate} />
                                 </Col>
                                 <Col sm={3}>
-                                    <Input type="select" onChange={this.onChangeEndMonth}>
+                                    <Input type="select" value={this.state.endMonth} onChange={this.onChangeEndMonth}>
                                         <option >เดือน?</option>
                                         <option value="1">มกราคม</option>
                                         <option value="2">กุมภาพันธ์</option>
@@ -556,13 +654,14 @@ class CreateSurvey3 extends Component {
                                     </Input>
                                 </Col>
                                 <Col sm={3}>
-                                    <Input type="text" placeholder="พ.ศ." onChange={this.onChangeEndYear} />
+                                    <Input type="text" placeholder="พ.ศ." value={this.state.endYear} onChange={this.onChangeEndYear} />
                                 </Col>
                             </FormGroup>
                         </div> : ""}
-
-                    <Button color="danger" onClick={this.backToStep2.bind(this)}>ย้อนกลับ</Button>
-                    <Button color="info" onClick={this.onSubmit}>เผยแพร่</Button>
+                    <br></br>
+                    <Button color="secondary" onClick={this.backToStep2.bind(this)}>ย้อนกลับ</Button>&nbsp;
+                    <Button color="primary" onClick={this.saveDraft.bind(this)}>บันทึกแบบร่าง</Button>&nbsp;
+                    <Button color="info" onClick={this.onSubmit}>ต่อไป</Button>
                 </Form>
                 {console.log(this.props.test)}
                 {this.state.dateToDo[0] !== undefined ? this.sendData() : ""}

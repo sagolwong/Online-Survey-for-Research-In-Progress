@@ -60,12 +60,60 @@ class SurveyCreator extends Component {
       type: 'BACKTOSTEP1'
     });
   }
+  saveDraft(){
+    console.log(JSON.parse(JSON.stringify(this.surveyCreator.text)));
+    //window.localStorage.setItem("LocalStorageSurvey", this.surveyCreator.text);
+    let builtIns = [];
+    let formSurvey;
+
+    if (this.props.builtIns.builtInWidgetGender) {
+      builtIns = builtIns.concat({ builtInWidget: "gender" })
+    }
+    if (this.props.builtIns.builtInWidgetAges) {
+      builtIns = builtIns.concat({ builtInWidget: "ages" })
+    }
+    if (this.props.builtIns.builtInWidgetStatus) {
+      builtIns = builtIns.concat({ builtInWidget: "status" })
+    }
+    if (this.props.builtIns.builtInWidgetEducation) {
+      builtIns = builtIns.concat({ builtInWidget: "education" })
+    }
+    if (this.props.builtIns.builtInWidgetJob) {
+      builtIns = builtIns.concat({ builtInWidget: "job" })
+    }
+    if (this.props.builtIns.builtInWidgetIncome) {
+      builtIns = builtIns.concat({ builtInWidget: "income" })
+    }
+    console.log(builtIns)
+
+    if (builtIns[0] !== undefined) {
+      formSurvey = {
+        data: JSON.parse(JSON.stringify(this.surveyCreator.text)),
+        builtIns: builtIns,
+        status: "draft"
+      }
+    } else {
+      formSurvey = {
+        data: JSON.parse(JSON.stringify(this.surveyCreator.text)),
+        status: "draft"
+      }
+    }
+    console.log(formSurvey)
+
+    this.props.dispatch({
+      type: 'ADD_DRAFT_STEP2',
+      formSurvey
+    });
+
+    console.log(this.props.test)
+  }
 
   render() {
     return (
       <div>
         <div id="surveyCreatorContainer" /><br></br>
-        <Button color="danger" onClick={this.backToStep1.bind(this)}>ย้อนกลับ</Button>
+        <Button color="secondary" onClick={this.backToStep1.bind(this)}>ย้อนกลับ</Button>&nbsp;
+        <Button color="primary" onClick={this.saveDraft.bind(this)}>บันทึกแบบร่าง</Button>&nbsp;
         <Button color="info" onClick={this.saveMySurvey}>ต่อไป</Button>
       </div>
     )

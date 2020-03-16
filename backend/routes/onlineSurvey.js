@@ -1,9 +1,9 @@
 const router = require('express').Router();
-let Survey = require('../models/survey.model');
+let onlineSurvey = require('../models/onlineSurvey.model');
 
 router.route('/').get((req, res) => {
-    Survey.find()
-        .then(surveys => res.json(surveys))
+    onlineSurvey.find()
+        .then(onlineSurveys => res.json(onlineSurveys))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
@@ -16,16 +16,15 @@ router.route('/create').post((req, res) => {
     const wantName = req.body.wantName;
     const haveGroup = req.body.haveGroup;
     const names = req.body.names;
-    const listNameExperiments = req.body.listNameExperiments;
-    const listNameControls = req.body.listNameControls;
     const frequency = req.body.frequency;
     const doOnce = req.body.doOnce;
     const openAndCloseTimes = req.body.openAndCloseTimes;
     const qprocess = req.body.qprocess;
     const builtIns = req.body.builtIns;
     const data = req.body.data;
+    const status = req.body.status;
 
-    const newSurvey = new Survey({
+    const newOnlineSurvey = new onlineSurvey({
         projectId,
         sampleGroupId,
         nameSurvey,
@@ -34,19 +33,18 @@ router.route('/create').post((req, res) => {
         wantName,
         haveGroup,
         names,
-        listNameExperiments,
-        listNameControls,
         frequency,
         doOnce,
         openAndCloseTimes,
         qprocess,
         builtIns,
-        data
+        data,
+        status
     });
 
-    newSurvey.save()
+    newOnlineSurvey.save()
         .then(() => res.json('Survey create!'))
-        .catch(err => res.status(400).json('Error: ' + err));
+        .catch(err => res.json('Error: ' + err));
 });
 
 /*router.route('/:id').get((req, res) => {
@@ -56,37 +54,37 @@ router.route('/create').post((req, res) => {
 });*/
 
 router.route('/:id').get((req, res) => {
-    Survey.find({ projectId: req.params.id })
-        .then(surveys => res.json(surveys))
+    onlineSurvey.find({ projectId: req.params.id })
+        .then(onlineSurveys => res.json(onlineSurveys))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/find/:id').get((req, res) => {
-    Survey.findById( req.params.id )
-        .then(surveys => res.json(surveys))
+    onlineSurvey.findById(req.params.id)
+        .then(onlineSurveys => res.json(onlineSurveys))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/group/:id').get((req, res) => {
-    Survey.find({ sampleGroupId: req.params.id })
-        .then(surveys => res.json(surveys))
+    onlineSurvey.find({ sampleGroupId: req.params.id })
+        .then(onlineSurveys => res.json(onlineSurveys))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/:id/:nameSurvey').get((req, res) => {
-    Survey.find({ projectId: req.params.id, nameSurvey: req.params.nameSurvey  })
-        .then(surveys => res.json(surveys))
+    onlineSurvey.find({ projectId: req.params.id, nameSurvey: req.params.nameSurvey })
+        .then(onlineSurveys => res.json(onlineSurveys))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/:id').delete((req, res) => {
-    Survey.findByIdAndDelete(req.params.id)
+    onlineSurvey.findByIdAndDelete(req.params.id)
         .then(() => res.json('Survey deleted.'))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/edit/:id').post((req, res) => {
-    Survey.findById(req.params.id)
+    onlineSurvey.findById(req.params.id)
         .then(survey => {
             survey.nameSample = req.body.nameSample;
             survey.nameSurvey = req.body.nameSurvey;
@@ -95,13 +93,12 @@ router.route('/edit/:id').post((req, res) => {
             survey.wantName = req.body.wantName;
             survey.haveGroup = req.body.haveGroup;
             survey.names = req.body.names;
-            survey.listNameExperiments = req.body.listNameExperiments;
-            survey.listNameControls = req.body.listNameControls;
             survey.frequency = req.body.frequency;
             survey.doOnce = req.body.doOnce;
             survey.openAndCloseTimes = req.body.openAndCloseTimes;
             survey.qprocess = req.body.qprocess;
             survey.data = req.body.data;
+            
 
 
             survey.save()
@@ -112,7 +109,7 @@ router.route('/edit/:id').post((req, res) => {
 });
 
 router.route('/member/:id').post((req, res) => {
-    Survey.findById(req.params.id)
+    onlineSurvey.findById(req.params.id)
         .then(survey => {
             survey.names = req.body.names;
 
@@ -122,26 +119,26 @@ router.route('/member/:id').post((req, res) => {
         })
         .catch(err => res.status(400).json('Error: ' + err));
 });
-
-router.route('/experiments/:id').post((req, res) => {
-    Survey.findById(req.params.id)
+router.route('/editSurvey/:id').post((req, res) => {
+    onlineSurvey.findById(req.params.id)
         .then(survey => {
-            survey.listNameExperiments = req.body.listNameExperiments;
+            survey.nameSurvey = req.body.nameSurvey;
+            survey.description = req.body.description;
+            survey.shareTo = req.body.shareTo;
+            survey.wantName = req.body.wantName;
+            survey.haveGroup = req.body.haveGroup;
+            survey.names = req.body.names;
+            survey.frequency = req.body.frequency;
+            survey.doOnce = req.body.doOnce;
+            survey.openAndCloseTimes = req.body.openAndCloseTimes;
+            survey.qprocess = req.body.qprocess;
+            survey.data = req.body.data;
+            survey.builtIns = req.body.builtIns;
+            survey.status = req.body.status;
+
 
             survey.save()
-                .then(() => res.json('ListNameExperiments update!'))
-                .catch(err => res.status(400).json('Error: ' + err));
-        })
-        .catch(err => res.status(400).json('Error: ' + err));
-});
-
-router.route('/controls/:id').post((req, res) => {
-    Survey.findById(req.params.id)
-        .then(survey => {
-            survey.listNameControls = req.body.listNameControls;
-
-            survey.save()
-                .then(() => res.json('ListNameControls update!'))
+                .then(() => res.json('Survey update!'))
                 .catch(err => res.status(400).json('Error: ' + err));
         })
         .catch(err => res.status(400).json('Error: ' + err));

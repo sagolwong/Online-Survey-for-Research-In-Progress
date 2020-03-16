@@ -65,7 +65,15 @@ export default class SampleGroupManagement extends Component {
     showGroupSurvey() {
         return (
             this.state.surveys.map(res => {
-                return <ListSurvey survey={res} />
+                if (res.status === "publish") return <ul><ListSurvey survey={res} /></ul>
+            })
+        )
+    }
+
+    showGroupDraft() {
+        return (
+            this.state.surveys.map(res => {
+                if (res.status === "draft") return <ul><ListSurvey survey={res} /></ul>
             })
         )
     }
@@ -78,7 +86,7 @@ export default class SampleGroupManagement extends Component {
         window.location = '/project-management/' + this.props.match.params.projectId;
     }
 
-    goToCreateSurvey(){
+    goToCreateSurvey() {
         window.location = `/create-survey/${this.props.match.params.projectId}/${this.props.match.params.sampleGroupId}`;
     }
 
@@ -107,7 +115,9 @@ export default class SampleGroupManagement extends Component {
                 </Row>
                 <div>
                     <Card>
-                        <p align="center">---------------------- กลุ่มแบบสอบถาม ----------------------</p>
+                        <p align="center">---------------------- แบบร่าง ----------------------</p>
+                        {this.showGroupDraft()}
+                        <p align="center">---------------------- แบบสอบถาม ----------------------</p>
                         {this.showGroupSurvey()}
                     </Card>
                 </div>

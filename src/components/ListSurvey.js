@@ -7,23 +7,25 @@ export default class ListSurvey extends Component {
         super(props);
         
         this.goToManageSurvey = this.goToManageSurvey.bind(this);
+        this.goToEditSurvey = this.goToEditSurvey.bind(this);
         
     }
-    /*componentDidMount(){
-        if(this.props.survey.nameSurvey==="ทดสอบ"){
-            axios.delete(`http://localhost:5000/surveys/`+this.props.survey._id)
-                .then(res => console.log(res.data));
-        }
-    }*/
+ 
 
     goToManageSurvey(){
         const surveyId = this.props.survey._id;
         window.location = `/survey-management/${surveyId}`;
     }
+    goToEditSurvey(){
+        const surveyId = this.props.survey._id;
+        const type = "draft"
+        window.location = `/edit-survey/${type}/${surveyId}`;
+    }
+    
     render() {
         return (
             <div>
-                <Card onClick={this.goToManageSurvey}>{this.props.survey.nameSurvey}</Card>
+                <Card style={{width:"600px"}} onClick={this.props.survey.status === "publish" ? this.goToManageSurvey :this.goToEditSurvey}>{this.props.survey.nameSurvey}</Card>
             </div>
         )
     }

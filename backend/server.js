@@ -26,7 +26,8 @@ var passport = passport();*/
 
 const usersRouter = require('./routes/users');
 const projectsRouter = require('./routes/projects');
-const surveysRouter = require('./routes/surveys');
+const onlineSurveyRouter = require('./routes/onlineSurvey');
+const prototypesRouter = require('./routes/prototypes');
 const answersRouter = require('./routes/answers');
 const listSurveyRouter = require('./routes/listSurvey');
 const requestRouter = require('./routes/requests');
@@ -37,7 +38,8 @@ const sampleGroupsRouter = require('./routes/sampleGroups');
 
 app.use('/users', usersRouter);
 app.use('/projects', projectsRouter);
-app.use('/surveys', surveysRouter);
+app.use('/surveys', onlineSurveyRouter);
+app.use('/prototypes', prototypesRouter);
 app.use('/answers', answersRouter);
 app.use('/listSurvey', listSurveyRouter);
 app.use('/requests', requestRouter);

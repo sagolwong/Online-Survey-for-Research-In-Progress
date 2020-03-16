@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const surveySchema = new Schema({
+const onlineSurveySchema = new Schema({
     projectId: {
         type: String,
         required: true,
@@ -17,9 +17,7 @@ const surveySchema = new Schema({
     }, description: {
         type: String,
     }, shareTo: {
-        type: String,
-        enum: ["public", "open", "close"],
-        required: true,
+        type: String
     }, wantName: {
         type: Boolean,
         required: true
@@ -29,8 +27,6 @@ const surveySchema = new Schema({
         required: true
     },
     names: Array,
-    listNameExperiments: Array,
-    listNameControls: Array,
     frequency: {
         amount: {
             type: Number
@@ -42,37 +38,36 @@ const surveySchema = new Schema({
         type: Boolean,
         required: true
     }, openAndCloseTimes: {
-        start:{
+        start: {
             day: {
-                type:Number,
-                required: true
+                type: Number
             }, month: {
-                type:Number,
-                required: true
+                type: Number
             }, year: {
-                type:Number,
-                required: true
+                type: Number
             }
-        }, end:{
+        }, end: {
             day: {
-                type:Number,
-                required: true
+                type: Number
             }, month: {
-                type:Number,
-                required: true
+                type: Number
             }, year: {
-                type:Number,
-                required: true
+                type: Number
             }
         }
     }, qprocess: Array,
-    builtIns:Array,
+    builtIns: Array,
     data: {
         type: Object,
         required: true
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: ["draft", "publish"],
     }
 });
 
-const Survey = mongoose.model('Survey', surveySchema);
+const OnlineSurvey = mongoose.model('OnlineSurvey', onlineSurveySchema);
 
-module.exports = Survey;
+module.exports = OnlineSurvey;
