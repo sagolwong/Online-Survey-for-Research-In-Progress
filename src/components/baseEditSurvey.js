@@ -17,6 +17,14 @@ class baseEditSurvey extends Component {
     async componentDidMount() {
         const type = this.props.match.params.type;
         const id = this.props.match.params.id;
+        var projectId = "";
+        var sampleGroupId = "";
+
+        if(await type ==="prototype"){
+            projectId = this.props.match.params.projectId;
+            if(this.props.match.params.sampleGroupId !== "no") sampleGroupId = this.props.match.params.sampleGroupId;
+        }
+
         if (await type === "draft") {
             await axios.get(`http://localhost:5000/surveys/find/` + id)
                 .then(response => {
@@ -59,9 +67,8 @@ class baseEditSurvey extends Component {
                 })
 
             var data = await {
-                projectId: "",
-                sampleGroupId: "",
-                nameSampleGroup: "",
+                projectId: projectId,
+                sampleGroupId: sampleGroupId,
                 nameSurvey: this.state.prototype.nameSurvey,
                 description: this.state.prototype.description,
                 shareTo: this.state.prototype.shareTo,
@@ -92,7 +99,7 @@ class baseEditSurvey extends Component {
         } else if (this.props.test.step === "e3") {
             console.log(this.props.test)
             if (this.props.match.params.type === "prototype") {
-                if (this.props.test.nameSampleGroup !== "") {
+                /*if (this.props.test.nameSampleGroup !== "") {
                     const sample = {
                         nameSampleGroup: this.props.test.nameSampleGroup
                     }
@@ -151,51 +158,94 @@ class baseEditSurvey extends Component {
                                 .catch((error) => {
                                     console.log(error);
                                 })
-                        });
-                } else if (this.props.test.nameSampleGroup === "" && this.props.test.sampleGroupId !== "") {
-                    data = {
-                        projectId: this.props.test.projectId,
-                        sampleGroupId: this.props.test.sampleGroupId,
-                        nameSurvey: this.props.test.nameSurvey,
-                        description: this.props.test.description,
-                        shareTo: this.props.test.shareTo,
-                        wantName: this.props.test.wantName,
-                        haveGroup: this.props.test.haveGroup,
-                        names: this.props.test.names,
-                        frequency: this.props.test.frequency,
-                        doOnce: this.props.test.doOnce,
-                        openAndCloseTimes: this.props.test.openAndCloseTimes,
-                        qprocess: this.props.test.qprocess,
-                        builtIns: this.props.test.builtIns,
-                        data: this.props.test.data,
-                        status: this.props.test.status
-                    }
-                    axios.post(`http://localhost:5000/surveys/create`, data)
-                        .then(res => {
-                            console.log(res.data)
-                            axios.get(`http://localhost:5000/surveys/${this.props.test.projectId}/` + data.nameSurvey)
-                                .then(response => {
-                                    console.log(response.data[0]._id);
-                                    if (this.props.test.status === "publish") {
-                                        if (this.props.test.dateToDo !== undefined) {
-                                            const frequency = {
-                                                surveyId: response.data[0]._id,
-                                                listTimeToDo: this.props.test.dateToDo
-                                            }
-                                            axios.post(`http://localhost:5000/frequency/create`, frequency)
-                                                .then(res => console.log(res.data))
-                                        }
-                                        window.location = '/survey-management/' + response.data[0]._id;
-                                    } else if (this.props.test.status === "draft") {
-                                        window.location = '/';
-                                    }
-
-                                })
-                                .catch((error) => {
-                                    console.log(error);
-                                })
-                        });
+                        });*/
+                /*data = {
+                    projectId: this.props.test.projectId,
+                    sampleGroupId: response.data[0]._id,
+                    nameSurvey: this.props.test.nameSurvey,
+                    description: this.props.test.description,
+                    shareTo: this.props.test.shareTo,
+                    wantName: this.props.test.wantName,
+                    haveGroup: this.props.test.haveGroup,
+                    names: this.props.test.names,
+                    frequency: this.props.test.frequency,
+                    doOnce: this.props.test.doOnce,
+                    openAndCloseTimes: this.props.test.openAndCloseTimes,
+                    qprocess: this.props.test.qprocess,
+                    builtIns: this.props.test.builtIns,
+                    data: this.props.test.data,
+                    status: this.props.test.status
                 }
+                axios.post(`http://localhost:5000/surveys/create`, data)
+                    .then(res => {
+                        console.log(res.data)
+                        axios.get(`http://localhost:5000/surveys/${this.props.test.projectId}/` + data.nameSurvey)
+                            .then(response => {
+                                console.log(response.data[0]._id);
+                                if (this.props.test.status === "publish") {
+                                    if (this.props.test.dateToDo !== undefined) {
+                                        const frequency = {
+                                            surveyId: response.data[0]._id,
+                                            listTimeToDo: this.props.test.dateToDo
+                                        }
+                                        axios.post(`http://localhost:5000/frequency/create`, frequency)
+                                            .then(res => console.log(res.data))
+                                    }
+                                    window.location = '/survey-management/' + response.data[0]._id;
+                                } else if (this.props.test.status === "draft") {
+                                    window.location = '/';
+                                }
+
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            })
+                    });*/
+
+                // } else if (this.props.test.nameSampleGroup === "" /*&& this.props.test.sampleGroupId !== ""*/) {
+                const data = {
+                    projectId: this.props.test.projectId,
+                    sampleGroupId: this.props.test.sampleGroupId,
+                    nameSurvey: this.props.test.nameSurvey,
+                    description: this.props.test.description,
+                    shareTo: this.props.test.shareTo,
+                    wantName: this.props.test.wantName,
+                    haveGroup: this.props.test.haveGroup,
+                    names: this.props.test.names,
+                    frequency: this.props.test.frequency,
+                    doOnce: this.props.test.doOnce,
+                    openAndCloseTimes: this.props.test.openAndCloseTimes,
+                    qprocess: this.props.test.qprocess,
+                    builtIns: this.props.test.builtIns,
+                    data: this.props.test.data,
+                    status: this.props.test.status
+                }
+                axios.post(`http://localhost:5000/surveys/create`, data)
+                    .then(res => {
+                        console.log(res.data)
+                        axios.get(`http://localhost:5000/surveys/${this.props.test.projectId}/` + data.nameSurvey)
+                            .then(response => {
+                                console.log(response.data[0]._id);
+                                if (this.props.test.status === "publish") {
+                                    if (this.props.test.dateToDo !== undefined) {
+                                        const frequency = {
+                                            surveyId: response.data[0]._id,
+                                            listTimeToDo: this.props.test.dateToDo
+                                        }
+                                        axios.post(`http://localhost:5000/frequency/create`, frequency)
+                                            .then(res => console.log(res.data))
+                                    }
+                                    window.location = '/survey-management/' + response.data[0]._id;
+                                } else if (this.props.test.status === "draft") {
+                                    window.location = '/';
+                                }
+
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            })
+                    });
+                // }
             } else if (this.props.match.params.type === "draft") {
                 const data = {
                     projectId: this.props.test.projectId,

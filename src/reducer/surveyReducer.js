@@ -14,7 +14,6 @@ let initialState = {
     data: {},
     builtIns: [],
     status: "",
-    nameSampleGroup: "",
     showSurvey: false,
     surveyManagement: false,
     comeFrom: "",
@@ -270,7 +269,6 @@ const surveyReducer = (state = initialState, action) => {
             state = {
                 projectId: action.data.projectId,
                 sampleGroupId: action.data.sampleGroupId,
-                nameSampleGroup: action.data.nameSampleGroup,
                 nameSurvey: action.data.nameSurvey,
                 description: action.data.description,
                 shareTo: action.data.shareTo,
@@ -291,9 +289,8 @@ const surveyReducer = (state = initialState, action) => {
 
         case 'EDIT_STEP1':
             state = {
-                projectId: action.data.projectId,
-                sampleGroupId: action.data.sampleGroupId,
-                nameSampleGroup: action.data.nameSampleGroup,
+                projectId: state.projectId,
+                sampleGroupId: state.sampleGroupId,
                 nameSurvey: action.data.nameSurvey,
                 description: action.data.description,
                 shareTo: action.data.shareTo,
@@ -316,7 +313,6 @@ const surveyReducer = (state = initialState, action) => {
             state = {
                 projectId: state.projectId,
                 sampleGroupId: state.sampleGroupId,
-                nameSampleGroup: state.nameSampleGroup,
                 nameSurvey: state.nameSurvey,
                 description: state.description,
                 shareTo: state.shareTo,
@@ -337,9 +333,8 @@ const surveyReducer = (state = initialState, action) => {
 
         case 'EDIT_DRAFT_STEP1':
             state = {
-                projectId: action.data.projectId,
-                sampleGroupId: action.data.sampleGroupId,
-                nameSampleGroup: action.data.nameSampleGroup,
+                projectId: state.projectId,
+                sampleGroupId: state.sampleGroupId,
                 nameSurvey: action.data.nameSurvey,
                 description: action.data.description,
                 shareTo: action.data.shareTo,
@@ -362,7 +357,6 @@ const surveyReducer = (state = initialState, action) => {
             state = {
                 projectId: state.projectId,
                 sampleGroupId: state.sampleGroupId,
-                nameSampleGroup: state.nameSampleGroup,
                 nameSurvey: state.nameSurvey,
                 description: state.description,
                 shareTo: state.shareTo,

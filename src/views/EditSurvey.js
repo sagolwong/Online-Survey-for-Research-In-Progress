@@ -42,8 +42,6 @@ class EditSurvey extends Component {
     constructor(props) {
         super(props);
 
-        this.onChangeProject = this.onChangeProject.bind(this);
-        this.onChangeSampleGroup = this.onChangeSampleGroup.bind(this);
         this.onChangeSurveyName = this.onChangeSurveyName.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeShareTo = this.onChangeShareTo.bind(this);
@@ -67,7 +65,6 @@ class EditSurvey extends Component {
         this.onChangeEndDate = this.onChangeEndDate.bind(this);
         this.onChangeEndMonth = this.onChangeEndMonth.bind(this);
         this.onChangeEndYear = this.onChangeEndYear.bind(this);
-        this.onChangeNameSampleGroup = this.onChangeNameSampleGroup.bind(this);
         this.sendData = this.sendData.bind(this);
 
         let newDate = new Date()
@@ -77,12 +74,6 @@ class EditSurvey extends Component {
 
 
         this.state = {
-            projects: [],
-            projectId: "",
-            sampleGroups: [],
-            sampleGroupId: "",
-            nameSampleGroup: "",
-            checkNewSampleGroup: false,
             nameSurvey: "",
             description: "",
             shareTo: "",
@@ -121,7 +112,7 @@ class EditSurvey extends Component {
     surveyCreator;
     componentDidMount() {
         const userId = "5dc9a42c824eb44fe43c8f94";
-        this.setState({
+        /*this.setState({
             projectId: this.props.test.projectId,
             sampleGroupId: this.props.test.sampleGroupId,
             nameSurvey: this.props.test.nameSurvey,
@@ -136,8 +127,31 @@ class EditSurvey extends Component {
             endDate: this.props.test.openAndCloseTimes.end.day,
             endMonth: this.props.test.openAndCloseTimes.end.month,
             endYear: this.props.test.openAndCloseTimes.end.year,
-        })
-
+        })*/
+        this.setState({ schedule: true })
+        //if (this.props.test.projectId !== "") this.setState({ projectId: this.props.test.projectId })
+        //if (this.props.test.sampleGroupId !== "") this.setState({ sampleGroupId: this.props.test.sampleGroupId })
+        if (this.props.test.nameSurvey !== "") this.setState({ nameSurvey: this.props.test.nameSurvey })
+        if (this.props.test.description !== "") this.setState({ description: this.props.test.description })
+        if (this.props.test.shareTo !== "") this.setState({ shareTo: this.props.test.shareTo })
+        if (this.props.test.wantName !== "") this.setState({ wantName: this.props.test.wantName })
+        if (this.props.test.haveGroup !== "") this.setState({ haveGroup: this.props.test.haveGroup })
+        if (this.props.test.openAndCloseTimes !== undefined) {
+            this.setState({
+                startDate: this.props.test.openAndCloseTimes.start.day,
+                startMonth: this.props.test.openAndCloseTimes.start.month,
+                startYear: this.props.test.openAndCloseTimes.start.year,
+                endDate: this.props.test.openAndCloseTimes.end.day,
+                endMonth: this.props.test.openAndCloseTimes.end.month,
+                endYear: this.props.test.openAndCloseTimes.end.year,
+            })
+        }
+        /*if(this.props.test.openAndCloseTimes.start.month !== "") this.setState({ startMonth: this.props.test.openAndCloseTimes.start.month })
+        if(this.props.test.openAndCloseTimes.start.year !== "") this.setState({ startYear: this.props.test.openAndCloseTimes.start.year })
+        if(this.props.test.openAndCloseTimes.end.day !== "") this.setState({ endDate: this.props.test.openAndCloseTimes.end.day })
+        if(this.props.test.openAndCloseTimes.end.month !== "") this.setState({ endMonth: this.props.test.openAndCloseTimes.end.month })
+        if(this.props.test.openAndCloseTimes.end.year !== "") this.setState({ endYear: this.props.test.openAndCloseTimes.end.year })
+*/
         this.props.test.builtIns.map(widget => {
             if (widget.builtInWidget === "gender") this.setState({ builtInWidgetGender: true })
             else if (widget.builtInWidget === "ages") this.setState({ builtInWidgetAges: true })
@@ -153,43 +167,25 @@ class EditSurvey extends Component {
                 setFreq: false
             })
         } else {
-            if (this.props.test.frequency.amount !== 0) {
-                this.setState({
-                    doOnce: false,
-                    setFreq: true,
-                    frequency: {
-                        amount: this.props.test.frequency.amount,
-                        unitsOfTime: this.props.test.frequency.unitsOfTime
-                    }
-                })
-            } else {
-                this.setState({
-                    doOnce: false,
-                    setFreq: false,
-                    doMany: true
-                })
-            }
-        }
-
-
-        if (this.props.test.status === "prototype") {
-            axios.get(`http://localhost:5000/projects/find/` + userId)
-                .then(response => {
+            if (this.props.test.frequency !== undefined) {
+                if (this.props.test.frequency.amount !== 0) {
                     this.setState({
-                        projects: response.data
+                        doOnce: false,
+                        setFreq: true,
+                        frequency: {
+                            amount: this.props.test.frequency.amount,
+                            unitsOfTime: this.props.test.frequency.unitsOfTime
+                        }
                     })
-                    console.log(this.state.projects);
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-        }
+                } else {
+                    this.setState({
+                        doOnce: false,
+                        setFreq: false,
+                        doMany: true
+                    })
+                }
+            }
 
-        if(this.props.test.nameSampleGroup !== ""){
-            this.setState({
-                nameSampleGroup: this.props.test.nameSampleGroup,
-                checkNewSampleGroup: true
-            })
         }
 
         let options = { showEmbededSurveyTab: false };
@@ -199,28 +195,19 @@ class EditSurvey extends Component {
         );
         this.surveyCreator.saveSurveyFunc = this.saveMySurvey;
         console.log(JSON.parse(JSON.stringify(this.surveyCreator.text)));
-        if (this.props.test.data[0] !== undefined) {
-            window.localStorage.setItem("LocalStorageSurvey", this.props.test.data);
-            this.surveyCreator.text = window.localStorage.getItem("LocalStorageSurvey") || "";
+        if (this.props.test.data !== undefined) {
+            if (this.props.test.data[0] !== undefined) {
+                window.localStorage.setItem("LocalStorageSurvey", this.props.test.data);
+                this.surveyCreator.text = window.localStorage.getItem("LocalStorageSurvey") || "";
+            }
+            console.log(window.localStorage.getItem("LocalStorageSurvey") || "");
+            window.localStorage.removeItem("LocalStorageSurvey");
         }
-        console.log(window.localStorage.getItem("LocalStorageSurvey") || "");
-        window.localStorage.removeItem("LocalStorageSurvey");
+
 
 
     }
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.projectId !== this.state.projectId) {
-            axios.get(`http://localhost:5000/sampleGroups/` + this.state.projectId)
-                .then(response => {
-                    this.setState({
-                        sampleGroups: response.data
-                    })
-                    console.log(this.state.sampleGroups);
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-        }
         if (prevState.checkHaveGroup !== this.state.checkHaveGroup) {
             this.setState({
                 setFreq: false,
@@ -232,21 +219,6 @@ class EditSurvey extends Component {
         }
     }
 
-    onChangeNameSampleGroup(e) {
-        this.setState({
-            nameSampleGroup: e.target.value
-        })
-    }
-    onChangeProject(e) {
-        this.setState({
-            projectId: e.target.value
-        })
-    }
-    onChangeSampleGroup(e) {
-        this.setState({
-            sampleGroupId: e.target.value
-        })
-    }
     onChangeSurveyName(e) {
         this.setState({
             nameSurvey: e.target.value
@@ -427,33 +399,7 @@ class EditSurvey extends Component {
             endYear: e.target.value
         })
     }
-    optionProject() {
-        return (
-            this.state.projects.map(project => {
-                return (
-                    <option value={project._id}>{project.nameProject}</option>
-                )
-            })
-        )
-    }
-    optionSampleGroup() {
-        return (
-            this.state.sampleGroups.map(sampleGroup => {
-                return (
-                    <option value={sampleGroup._id}>{sampleGroup.nameSampleGroup}</option>
-                )
-            })
-        )
-    }
-    newSampleGroup() {
-        this.setState({ checkNewSampleGroup: true })
-    }
-    oldSampleGroup(){
-        this.setState({ 
-            checkNewSampleGroup: false,
-            nameSampleGroup: ""
-         })
-    }
+    
     saveDraft() {
         const start = {
             day: Number(this.state.startDate),
@@ -497,9 +443,6 @@ class EditSurvey extends Component {
 
         if (builtIns[0] !== undefined) {
             data = {
-                projectId: this.state.projectId,
-                sampleGroupId: this.state.sampleGroupId,
-                nameSampleGroup: this.state.nameSampleGroup,
                 nameSurvey: this.state.nameSurvey,
                 description: this.state.description,
                 shareTo: this.state.shareTo,
@@ -514,8 +457,6 @@ class EditSurvey extends Component {
             }
         } else {
             data = {
-                projectId: this.state.projectId,
-                sampleGroupId: this.state.sampleGroupId,
                 nameSampleGroup: this.state.nameSampleGroup,
                 nameSurvey: this.state.nameSurvey,
                 description: this.state.description,
@@ -767,9 +708,6 @@ class EditSurvey extends Component {
 
             if (builtIns[0] !== undefined) {
                 data = {
-                    projectId: this.state.projectId,
-                    sampleGroupId: this.state.sampleGroupId,
-                    nameSampleGroup: this.state.nameSampleGroup,
                     nameSurvey: this.state.nameSurvey,
                     description: this.state.description,
                     shareTo: this.state.shareTo,
@@ -784,9 +722,6 @@ class EditSurvey extends Component {
                 }
             } else {
                 data = {
-                    projectId: this.state.projectId,
-                    sampleGroupId: this.state.sampleGroupId,
-                    nameSampleGroup: this.state.nameSampleGroup,
                     nameSurvey: this.state.nameSurvey,
                     description: this.state.description,
                     shareTo: this.state.shareTo,
@@ -853,9 +788,6 @@ class EditSurvey extends Component {
 
         if (builtIns[0] !== undefined) {
             data = {
-                projectId: this.state.projectId,
-                sampleGroupId: this.state.sampleGroupId,
-                nameSampleGroup: this.state.nameSampleGroup,
                 nameSurvey: this.state.nameSurvey,
                 description: this.state.description,
                 shareTo: this.state.shareTo,
@@ -871,9 +803,6 @@ class EditSurvey extends Component {
             }
         } else {
             data = {
-                projectId: this.state.projectId,
-                sampleGroupId: this.state.sampleGroupId,
-                nameSampleGroup: this.state.nameSampleGroup,
                 nameSurvey: this.state.nameSurvey,
                 description: this.state.description,
                 shareTo: this.state.shareTo,
@@ -900,39 +829,8 @@ class EditSurvey extends Component {
         return (
             <div className="sec">
                 <h1>{this.props.test.status === "prototype" ? "แบบสอบถามต้นแบบ" : "แก้ไขแบบสอบถาม"}</h1>
-                {this.props.test.status === "prototype" ?
-                    <div>
-                        <h3>ส่วนที่ 1 : ตำแหน่งที่ต้องการบันทึก</h3>
-                        <FormGroup>
-                            <Label>คุณต้องการบันทึกลงโปรเจคใด?</Label>
-                            <Input type="select" value={this.state.projectId} onChange={this.onChangeProject}>
-                                <option value="no">โปรเจคที่เลือก ?</option>
-                                {this.optionProject()}
-                            </Input>
-                        </FormGroup>
-                        <FormGroup>
-                            {this.state.projectId !== "" ?
-                                <div>
-                                    {this.state.checkNewSampleGroup ?
-                                        <div>
-                                            <Label>ชื่อกลุ่มตัวอย่างใหม่?(<Button color="link" onClick={this.oldSampleGroup.bind(this)}>เลือกจากที่มีในโปรเจค</Button>)</Label>
-                                            <Input type="text" value={this.state.nameSampleGroup} placeholder="ชื่อกลุ่มตัวอย่าง" onChange={this.onChangeNameSampleGroup} />
-                                        </div>
-                                        : <div>
-                                            <Label>คุณต้องการบันทึกลงกลุ่มตัวอย่างใด? (<Button color="link" onClick={this.newSampleGroup.bind(this)}>สร้างกลุ่มตัวอย่างใหม่</Button>)</Label>
-                                            <Input type="select" value={this.state.sampleGroupId} onChange={this.onChangeSampleGroup}>
-                                                <option value="no">กลุ่มตัวอย่างที่เลือก ?</option>
-                                                {this.optionSampleGroup()}
-                                            </Input>
-                                        </div>}
-
-                                </div>
-                                : ""}
-                        </FormGroup>
-                    </div>
-                    : ""}
                 <br></br>
-                <h3>ส่วนที่ {this.props.test.status === "prototype" ? "2" : "1"} : ข้อมูลทั่วไป</h3>
+                <h3>ส่วนที่ 1 : ข้อมูลทั่วไป</h3>
                 <FormGroup>
                     <Label>ชื่อแบบสอบถาม</Label>
                     <Input required type="text" value={this.state.nameSurvey} placeholder="ชื่อแบบสอบถาม" onChange={this.onChangeSurveyName} />
@@ -964,7 +862,7 @@ class EditSurvey extends Component {
                         </Label>
                     </FormGroup> : ""}
                 <br></br>
-                <h3>ส่วนที่ {this.props.test.status === "prototype" ? "3" : "2"} : แบบสอบถาม</h3>
+                <h3>ส่วนที่ 2 : แบบสอบถาม</h3>
                 <h4>คำถามพื้นฐานสำเร็จรูป</h4>
                 <p>โปรดเลือกคำถามเกี่ยวกับข้อมูลส่วนตัวจากที่นี่</p>
                 <FormGroup check>
@@ -1008,7 +906,7 @@ class EditSurvey extends Component {
                 <br></br>
                 <div id="surveyCreatorContainer" />
                 <br></br>
-                <h3>ส่วนที่ {this.props.test.status === "prototype" ? "4" : "3"} : ความถี่/ระยะเวลา</h3>
+                <h3>ส่วนที่ 3 : ความถี่/ระยะเวลา</h3>
                 <div><p>ความถี่ในการทำแบบสอบถาม</p></div>
                 <FormGroup row>
                     <Col>

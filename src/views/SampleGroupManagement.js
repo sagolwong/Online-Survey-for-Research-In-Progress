@@ -1,26 +1,32 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Card, Row, Col, Button, NavLink, Breadcrumb, BreadcrumbItem, Input } from 'reactstrap'
+import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Card, Row, Col, Button, Breadcrumb, BreadcrumbItem, Label } from 'reactstrap'
 import ListSurvey from '../components/ListSurvey';
+import ListPrototype from '../components/ListPrototype';
 
 export default class SampleGroupManagement extends Component {
     constructor(props) {
         super(props);
         this.state = {
             isOpen: false,
+            checkShowPrototype: false,
             nameSampleGroup: "",
             project: {},
             surveys: [],
-            sampleGroup: {}
+            sampleGroup: {},
+            listPrototype: []
         }
         this.toggle = this.toggle.bind(this);
         this.comeback = this.comeback.bind(this);
+        this.showPrototypes = this.showPrototypes.bind(this);
+        this.showMorePrototype = this.showMorePrototype.bind(this);
         this.goToCreateSurvey = this.goToCreateSurvey.bind(this);
     }
 
     componentDidMount() {
         const projectId = this.props.match.params.projectId;
         const sampleGroupId = this.props.match.params.sampleGroupId;
+        const userId = "5dc9a42c824eb44fe43c8f94";
         console.log(projectId);
         console.log(sampleGroupId);
         axios.get(`http://localhost:5000/projects/` + projectId)
@@ -60,6 +66,17 @@ export default class SampleGroupManagement extends Component {
             .catch((error) => {
                 console.log(error);
             })
+
+        axios.get('http://localhost:5000/prototypes/' + userId)
+            .then(response => {
+                this.setState({
+                    listPrototype: response.data
+                })
+                console.log(this.state.listPrototype)
+            })
+            .catch((error) => {
+                console.log(error);
+            })
     }
 
     showGroupSurvey() {
@@ -77,6 +94,24 @@ export default class SampleGroupManagement extends Component {
             })
         )
     }
+    showPrototypes() {
+        return (
+            this.state.listPrototype.map((res, index) => {
+                if (index < 3) {
+                    return <Col sm={4}><ListPrototype prototype={res} projectId={this.props.match.params.projectId} sampleGroupId={this.props.match.params.sampleGroupId} /></Col>
+                }
+            })
+        )
+    }
+    showMorePrototype(indexC) {
+        return (
+            this.state.listPrototype.map((res, index) => {
+                if (((index + 1) / 3) < indexC && ((index + 1) / 3) > (indexC - 1)) {
+                    return <Col sm={4}><ListPrototype prototype={res} projectId={this.props.match.params.projectId} sampleGroupId={this.props.match.params.sampleGroupId} /></Col>
+                }
+            })
+        )
+    }
 
     toggle() {
         this.setState({ isOpen: !this.state.isOpen })
@@ -91,6 +126,7 @@ export default class SampleGroupManagement extends Component {
     }
 
     render() {
+        var indexC = 2;
         return (
             <div className="sec">
                 <div><h2>{this.state.project.nameProject}</h2></div>
@@ -114,13 +150,39 @@ export default class SampleGroupManagement extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <Card>
-                        <p align="center">---------------------- แบบร่าง ----------------------</p>
-                        {this.showGroupDraft()}
-                        <p align="center">---------------------- แบบสอบถาม ----------------------</p>
-                        {this.showGroupSurvey()}
-                    </Card>
+                    <Row>
+                        <Col><Label>แม่แบบแบบสอบถาม</Label></Col>
+                        {this.state.checkShowPrototype ?
+                            <Col><Label><Button color="link" onClick={() => this.setState({ checkShowPrototype: false })}>แสดงแม่แบบน้อยลง ^</Button></Label></Col>
+                            : <Col><Label><Button color="link" onClick={() => this.setState({ checkShowPrototype: true })}>แสดงแม่แบบเพิ่มเติม v</Button></Label></Col>}
+
+                    </Row>
+                    <Row>
+                        {this.showPrototypes()}
+                    </Row>
                 </div>
+                <br></br>
+                {this.state.checkShowPrototype ?
+                    <div>{
+                        this.state.listPrototype.map((res, index) => {
+                            if (((index + 1) / 3) < indexC && ((index + 1) / 3) > (indexC - 1)) {
+                                indexC = indexC + 1;
+                                return (
+                                    <Row>
+                                        {this.showMorePrototype(indexC - 1)}
+                                    </Row>
+                                )
+                            }
+                        })}</div>
+                    : <div>
+                        <Card>
+                            <p align="center">---------------------- แบบร่าง ----------------------</p>
+                            {this.showGroupDraft()}
+                            <p align="center">---------------------- แบบสอบถาม ----------------------</p>
+                            {this.showGroupSurvey()}
+                        </Card>
+                    </div>}
+
             </div>
         )
     }

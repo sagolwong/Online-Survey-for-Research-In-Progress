@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import { ButtonDropdown, Modal, ModalFooter, ModalHeader, ModalBody, DropdownToggle, DropdownMenu, DropdownItem, Card, Row, Col, Button, NavLink, Breadcrumb, BreadcrumbItem, Input } from 'reactstrap'
+import { ButtonDropdown, Modal, ModalFooter, ModalHeader, ModalBody, DropdownToggle, DropdownMenu, DropdownItem, Card, Row, Col, Button, NavLink, Breadcrumb, BreadcrumbItem, Input, Label } from 'reactstrap'
 import ListSurvey from '../components/ListSurvey';
 import ListSampleGroup from '../components/ListSampleGroup';
+import ListPrototype from '../components/ListPrototype';
 
 export default class ProjectManagement extends Component {
     constructor(props) {
@@ -11,20 +12,25 @@ export default class ProjectManagement extends Component {
             isOpen: false,
             modal: false,
             success: false,
+            checkShowPrototype: false,
             nameSampleGroup: "",
             project: {},
             surveys: [],
-            sampleGroups: []
+            sampleGroups: [],
+            listPrototype: []
         }
         this.toggle = this.toggle.bind(this);
         this.toggleModalCreate = this.toggleModalCreate.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
+        this.showPrototypes = this.showPrototypes.bind(this);
+        this.showMorePrototype = this.showMorePrototype.bind(this);
         this.onChangeNameSampleGroup = this.onChangeNameSampleGroup.bind(this);
         this.goToCreateSurvey = this.goToCreateSurvey.bind(this);
     }
 
     componentDidMount() {
         const projectId = this.props.match.params.projectId;
+        const userId = "5dc9a42c824eb44fe43c8f94";
         console.log(projectId);
         axios.get(`http://localhost:5000/projects/` + projectId)
             .then(response => {
@@ -58,6 +64,17 @@ export default class ProjectManagement extends Component {
                     sampleGroups: response.data
                 })
                 console.log(this.state.sampleGroups);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+
+        axios.get('http://localhost:5000/prototypes/' + userId)
+            .then(response => {
+                this.setState({
+                    listPrototype: response.data
+                })
+                console.log(this.state.listPrototype)
             })
             .catch((error) => {
                 console.log(error);
@@ -137,6 +154,25 @@ export default class ProjectManagement extends Component {
         )
     }
 
+    showPrototypes() {
+        return (
+            this.state.listPrototype.map((res, index) => {
+                if (index < 3) {
+                    return <Col sm={4}><ListPrototype prototype={res} projectId={this.props.match.params.projectId} /></Col>
+                }
+            })
+        )
+    }
+    showMorePrototype(indexC) {
+        return (
+            this.state.listPrototype.map((res, index) => {
+                if (((index+1) / 3) < indexC && ((index+1) / 3) > (indexC - 1)) {
+                    return <Col sm={4}><ListPrototype prototype={res} projectId={this.props.match.params.projectId} /></Col>
+                }
+            })
+        )
+    }
+
     onChangeNameSampleGroup(e) {
         this.setState({
             nameSampleGroup: e.target.value
@@ -149,6 +185,7 @@ export default class ProjectManagement extends Component {
 
 
     render() {
+        var indexC = 2;
         return (
             <div className="sec">
                 <div><h2>{this.state.project.nameProject}</h2></div>
@@ -184,15 +221,41 @@ export default class ProjectManagement extends Component {
                     </ModalFooter>
                 </Modal>
                 <div>
-                    <Card>
-                        <p align="center">---------------------- แบบร่าง ----------------------</p>
-                        {this.showGroupDraft()}
-                        <p align="center">---------------------- แบบสอบถาม ----------------------</p>
-                        {this.showGroupSurvey()}
-                        <p align="center">------------------------ กลุ่มตัวอย่าง ------------------------</p>
-                        {this.showGroupSampleGroup()}
-                    </Card>
+                    <Row>
+                        <Col><Label>แม่แบบแบบสอบถาม</Label></Col>
+                        {this.state.checkShowPrototype ?
+                            <Col><Label><Button color="link" onClick={() => this.setState({ checkShowPrototype: false })}>แสดงแม่แบบน้อยลง ^</Button></Label></Col>
+                            : <Col><Label><Button color="link" onClick={() => this.setState({ checkShowPrototype: true })}>แสดงแม่แบบเพิ่มเติม v</Button></Label></Col>}
+
+                    </Row>
+                    <Row>
+                        {this.showPrototypes()}
+                    </Row>
                 </div>
+                <br></br>
+                {this.state.checkShowPrototype ?
+                    <div>{
+                        this.state.listPrototype.map((res, index) => {
+                            if (((index+1) / 3) < indexC && ((index+1) / 3) > (indexC - 1)) {
+                                indexC = indexC + 1;
+                                return (
+                                    <Row>
+                                        {this.showMorePrototype(indexC - 1)}
+                                    </Row>
+                                )
+                            }
+                        })}</div>
+                    : <div>
+                        <Card>
+                            <p align="center">---------------------- แบบร่าง ----------------------</p>
+                            {this.showGroupDraft()}
+                            <p align="center">---------------------- แบบสอบถาม ----------------------</p>
+                            {this.showGroupSurvey()}
+                            <p align="center">------------------------ กลุ่มตัวอย่าง ------------------------</p>
+                            {this.showGroupSampleGroup()}
+                        </Card>
+                    </div>}
+
             </div>
         )
     }
